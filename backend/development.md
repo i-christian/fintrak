@@ -10,6 +10,9 @@
     sqlx database create
     ```
   - ```
+    sqlx migrate add schema.sql
+    ```
+  - ```
      sqlx migrate run
     ```
   - ```

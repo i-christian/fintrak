@@ -12,6 +12,7 @@ mod router;
 
 use router::create_api_router;
 use tracing::info;
+use tracing_subscriber::FmtSubscriber;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -29,6 +30,9 @@ impl FromRef<AppState> for Key {
 
 #[tokio::main]
 async fn main() {
+    tracing::subscriber::set_global_default(FmtSubscriber::default())
+        .expect("setting default subscriber failed");
+
     let (database_url, domain) = grab_secrets();
     let postgres = PgPoolOptions::new()
         .max_connections(10)
