@@ -1,1 +1,3 @@
-# fintrak
+# Fintrak
+
+A finance tracking application
