@@ -1,3 +1,4 @@
+-- Add migration script here
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -13,12 +14,4 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id int NOT NULL UNIQUE,
     expires TIMESTAMP WITH TIME ZONE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE IF NOT EXISTS apikeys (
-    id SERIAL PRIMARY KEY,
-    api_key VARCHAR NOT NULL,
-    owner_id int,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    last_used TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 );
