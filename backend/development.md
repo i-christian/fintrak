@@ -1,4 +1,4 @@
-# Backend Development
+# Expense Tracker App
 
 ## Setting up database locally
 - Ensure you have PostgreSQL installed.
@@ -10,5 +10,8 @@
     sqlx database create
     ```
   - ```
-    sqlx migrate add <DESCRIPTION>
+     sqlx migrate add <DESC>
     ```
+  - ```
+    cargo sqlx prepare
+   ```
