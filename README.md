@@ -16,13 +16,13 @@ FinTrak is an innovative real-time finance tracking app designed to help users m
 The app uses Rust for a high-performance backend, SolidJS for a dynamic frontend, and PostgreSQL for secure data persistence. The entire stack is containerized with Docker to ensure a seamless development and deployment experience.
 
 ### Key Features
-
-- [] **Real-Time Budget Monitoring**: Track spending in real-time with live updates as transactions happen.
-- [] **Collaborative Finance Tracking**: Allow users to collaborate on shared financial goals (e.g., household budgets, group savings plans).
-- [] **Instant Alerts and Notifications**: Send real-time notifications for unusual spending, bill reminders, or savings milestones.
-- [] **Custom Financial Goals**: Users can set goals like saving for a vacation, and the app provides a real-time tracker.
-- [] **Multiple Currency Support**: Track finances across multiple currencies and provide automatic conversion rates.
-- [] Cross-Platform Accessibility: A responsive, dynamic UI that works seamlessly across all devices.
+- [x] **User Authentication**: Allow users to create accounts using an email address and password
+- [ ] **Real-Time Budget Monitoring**: Track spending in real-time with live updates as transactions happen.
+- [ ] **Collaborative Finance Tracking**: Allow users to collaborate on shared financial goals (e.g., household budgets, group savings plans).
+- [ ] **Instant Alerts and Notifications**: Send real-time notifications for unusual spending, bill reminders, or savings milestones.
+- [ ] **Custom Financial Goals**: Users can set goals like saving for a vacation, and the app provides a real-time tracker.
+- [ ] **Multiple Currency Support**: Track finances across multiple currencies and provide automatic conversion rates.
+- [ ] Cross-Platform Accessibility: A responsive, dynamic UI that works seamlessly across all devices.
 
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
