@@ -1,17 +1,20 @@
 use crate::AppState;
 use axum::{
-    http::{self},
-    middleware::{self},
-    routing::{get, post},
+    http, middleware,
+    routing::{get, post, put},
     Router,
 };
-use http::header::{ACCEPT, AUTHORIZATION, ORIGIN};
 use http::HeaderValue;
 use http::Method;
+use http::{
+    header::{ACCEPT, AUTHORIZATION, ORIGIN},
+    StatusCode,
+};
 use tower_http::cors::CorsLayer;
 
-use crate::auth::{login, logout, register, validate_session};
-
+use crate::auth::{
+    delete_user, edit_user, get_all_users, login, logout, register, validate_session,
+};
 
 pub fn create_api_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
@@ -20,14 +23,16 @@ pub fn create_api_router(state: AppState) -> Router {
         .allow_headers(vec![ORIGIN, AUTHORIZATION, ACCEPT])
         .allow_origin(state.domain.parse::<HeaderValue>().unwrap());
 
-
     let auth_router = Router::new()
         .route("/register", post(register))
         .route("/login", post(login))
-        .route("/logout", get(logout));
+        .route("/logout", get(logout))
+        .route("/users", put(edit_user).delete(delete_user))
+        .route("/get_all_users", get(get_all_users));
 
     Router::new()
         // nest protected routes here
+        .route("/check", get(auth_check))
         .layer(middleware::from_fn_with_state(
             state.clone(),
             validate_session,
@@ -36,6 +41,10 @@ pub fn create_api_router(state: AppState) -> Router {
         .route("/health", get(hello_world))
         .with_state(state)
         .layer(cors)
+}
+
+pub async fn auth_check() -> StatusCode {
+    StatusCode::OK
 }
 
 pub async fn hello_world() -> &'static str {
