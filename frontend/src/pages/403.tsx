@@ -4,7 +4,7 @@ import { Component } from "solid-js";
 const Forbidden: Component = () => {
   const navigate = useNavigate();
   return (
-    <section class="bg-inherit">
+    <section class="bg-gray-100">
       <div class="flex sm:flex-wrap items-center min-h-screen px-6 py-12 mx-auto">
         <div>
           <p class="text-sm font-medium text-red-500 dark:text-red-400">403 Forbidden</p>
