@@ -114,7 +114,7 @@ const Login: Component = () => {
           <div class="flex w-full">
             <button
               type="submit"
-              class="flex mt-2 items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-black hover:bg-slate-950 rounded-md py-2 w-full transition duration-150 ease-in"
+              class="flex mt-2 items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-slate-800 hover:bg-slate-950 rounded-md py-2 w-full transition duration-150 ease-in"
             >
               <span class="mr-2 uppercase">Log In &rarr;</span>
             </button>
