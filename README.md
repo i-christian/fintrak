@@ -11,18 +11,19 @@
 
 ## Description
 
-FinTrak is an innovative real-time finance tracking app designed to help users manage their finances intelligently. It offers features like smart budget monitoring, automated insights, and collaborative financial planning. 
+FinTrak is a finance tracking app designed to help users manage their personal and group finances effectively. The app offers essential budgeting tools, transaction tracking, and collaboration features.
 
-The app uses Rust for a high-performance backend, SolidJS for a dynamic frontend, and PostgreSQL for secure data persistence. The entire stack is containerized with Docker to ensure a seamless development and deployment experience.
+Built with a modern tech stack, FinTrak utilizes Rust for its high-performance backend, SolidJS for a reactive and intuitive frontend, and PostgreSQL for secure and efficient data management. Containerized with Docker, it ensures seamless development and deployment.
 
 ### Key Features
 - [x] **User Authentication**: Allow users to create accounts using an email address and password
-- [ ] **Real-Time Budget Monitoring**: Track spending in real-time with live updates as transactions happen.
+- [ ] **Group Management**: Create and manage financial groups with role-based permissions.
 - [ ] **Collaborative Finance Tracking**: Allow users to collaborate on shared financial goals (e.g., household budgets, group savings plans).
-- [ ] **Instant Alerts and Notifications**: Send real-time notifications for unusual spending, bill reminders, or savings milestones.
-- [ ] **Custom Financial Goals**: Users can set goals like saving for a vacation, and the app provides a real-time tracker.
-- [ ] **Multiple Currency Support**: Track finances across multiple currencies and provide automatic conversion rates.
-- [ ] Cross-Platform Accessibility: A responsive, dynamic UI that works seamlessly across all devices.
+- [ ] **Category Management**: Define custom income and expense categories for users and groups.
+- [ ] **Transaction Tracking**: Log and manage transactions for individuals and groups, categorized as expense or income.
+- [ ] **Budget Management**: Set and monitor budgets for specific categories within a group.
+- [ ] **Financial Reports**: Generate summaries of income, expenses, and budget performance for specific time periods.
+- [ ] **Cross-Platform Accessibility**: A responsive, dynamic UI that works seamlessly across all devices.
 
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
@@ -38,7 +39,7 @@ The app uses Rust for a high-performance backend, SolidJS for a dynamic frontend
 ### Clone the Repository
 clone the `fintrak` repository to your local machine:
 ```
-git clone https://github.com//fintrak.git
+git clone https://github.com/i-christian/fintrak.git
 
 cd fintrak
 ```
@@ -80,4 +81,4 @@ FinTrak is licensed under the MIT License. See the [LICENSE](LICENSE) file for d
 ## Acknowledgements 🙌
 Special thanks to the developers of Rust, Axum, and SolidJS for their excellent tools and libraries.
 
-Enjoy chatting with FinTrak! 🚀💬
+Enjoy using FinTrak! 🚀
