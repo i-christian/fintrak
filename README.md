@@ -38,7 +38,7 @@ The app uses Rust for a high-performance backend, SolidJS for a dynamic frontend
 ### Clone the Repository
 clone the `fintrak` repository to your local machine:
 ```
-git clone https://github.com/i-christian/fintrak.git
+git clone https://github.com//fintrak.git
 
 cd fintrak
 ```
