@@ -9,6 +9,7 @@ export default function Register() {
   const [pw, setPw] = createSignal<string>("");
   const [pwConfirm, setPwConfirm] = createSignal<string>("");
   const [pwVis, setPwVis] = createSignal<boolean>(false);
+  const [error, setError] = createSignal<string>("");
 
   const navigate = useNavigate();
 
@@ -18,7 +19,7 @@ export default function Register() {
     const url = `//${window.location.host}/api/auth/register`;
 
     try {
-      await fetch(url, {
+      const response = await fetch(url, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -31,7 +32,14 @@ export default function Register() {
         }),
       });
 
-      navigate("/login");
+      if (response.status === 400) {
+        setError("Email already registered")
+        return;
+      }
+
+      if (response.status === 201) {
+        navigate("/login");
+      }
     } catch (e) {
       console.error(`Error: ${e}`);
     }
@@ -48,7 +56,12 @@ export default function Register() {
       onSubmit={handleSubmit}
     >
       <div class="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-50 max-w-md">
-        <h1 class="lg:text-2xl text-xl text-center">Register</h1>
+        <h1 class="lg:text-2xl text-xl text-center">Create an Account</h1>
+        {error() && (
+          <p class="mt-4 text-center text-red-600 text-sm animate-bounce">
+            {error()}
+          </p>
+        )}
 
         <fieldset class="mt-10">
           <label for="name" class="text-xs tracking-wide text-gray-600">
