@@ -16,7 +16,7 @@ html {
 }
 
 .primary_bg {
-  @apply bg-emerald-800;
+  @apply bg-emerald-500;
 }
 
 .btn {

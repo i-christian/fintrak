@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL UNIQUE
+    user_id UUID NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     type VARCHAR(50) NOT NULL CHECK (type IN ('expense', 'income')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL UNIQUE
+    user_id UUID NOT NULL UNIQUE,
     category_id UUID NOT NULL,
     amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
     transaction_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
