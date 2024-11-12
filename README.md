@@ -17,13 +17,15 @@ Built with a modern tech stack, FinTrak utilizes Rust for its high-performance b
 
 ### Key Features
 - [x] **User Authentication**: Allow users to create accounts using an email address and password
-- [ ] **Group Management**: Create and manage financial groups with role-based permissions.
-- [ ] **Collaborative Finance Tracking**: Allow users to collaborate on shared financial goals (e.g., household budgets, group savings plans).
+- [ ] **Personal Management**: Create and manage financial
 - [ ] **Category Management**: Define custom income and expense categories for users and groups.
 - [ ] **Transaction Tracking**: Log and manage transactions for individuals and groups, categorized as expense or income.
 - [ ] **Budget Management**: Set and monitor budgets for specific categories within a group.
 - [ ] **Financial Reports**: Generate summaries of income, expenses, and budget performance for specific time periods.
 - [ ] **Cross-Platform Accessibility**: A responsive, dynamic UI that works seamlessly across all devices.
+- [ ] **Group Management**: Create and manage financial groups with role-based permissions.
+- [ ] **Collaborative Finance Tracking**: Allow users to collaborate on shared financial goals (e.g., household budgets, group savings plans).
+
 
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
