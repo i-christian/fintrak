@@ -7,31 +7,32 @@ import Register from "./pages/Register";
 import Forbidden from "./pages/403";
 import WrongPage from "./pages/404";
 
-export const [isLoggedIn, setIsLoggedIn] = createSignal(false);
+//should be set to false
+export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
 
 const App: Component = () => {
-  onMount(async () => {
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      try {
-        const response = await fetch(`//${window.location.host}/api/check`, {
-          method: "GET",
-          credentials: "include"
-        });
+  // onMount(async () => {
+  //   if (localStorage.getItem("isLoggedIn") === "true") {
+  //     try {
+  //       const response = await fetch(`//${window.location.host}/api/check`, {
+  //         method: "GET",
+  //         credentials: "include"
+  //       });
 
-        if (response.ok) {
-          setIsLoggedIn(true);
-          localStorage.setItem("isLoggedIn", "true");
-        } else {
-          setIsLoggedIn(false);
-          localStorage.removeItem("isLoggedIn");
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-        setIsLoggedIn(false);
-      }
-    }
-    setIsLoggedIn(false);
-  });
+  //       if (response.ok) {
+  //         setIsLoggedIn(true);
+  //         localStorage.setItem("isLoggedIn", "true");
+  //       } else {
+  //         setIsLoggedIn(false);
+  //         localStorage.removeItem("isLoggedIn");
+  //       }
+  //     } catch (error) {
+  //       console.error("Auth check error:", error);
+  //       setIsLoggedIn(false);
+  //     }
+  //   }
+  //   setIsLoggedIn(false);
+  // });
 
   return (
     <Router>

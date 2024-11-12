@@ -86,7 +86,6 @@ const Login: Component = () => {
               class="text-sm placeholder-gray-500 pl-10 pr-4 rounded-md border border-gray-400 w-full py-2 focus:outline-none focus:border-black"
               value={email()}
               onInput={(e: InputEvent) => setEmail(e.target.value)}
-              placeholder="Enter your email"
             />
           </div>
 
@@ -100,7 +99,6 @@ const Login: Component = () => {
               class="text-sm placeholder-gray-500 pl-10 pr-4 rounded-md border border-gray-400 w-full py-2 focus:outline-none focus:border-black"
               value={pw()}
               onInput={(e: InputEvent) => setPw(e.target.value)}
-              placeholder="Enter your password"
             />
             <button
               class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"
@@ -114,7 +112,7 @@ const Login: Component = () => {
           <div class="flex w-full">
             <button
               type="submit"
-              class="flex mt-2 items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-slate-800 hover:bg-slate-950 rounded-md py-2 w-full transition duration-150 ease-in"
+              class="btn"
             >
               <span class="mr-2 uppercase">Log In &rarr;</span>
             </button>

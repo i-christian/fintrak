@@ -14,3 +14,26 @@ html {
   font-family: "Poppins", sans-serif;
   background-color: #172554;
 }
+
+.primary_bg {
+  @apply bg-emerald-800;
+}
+
+.btn {
+  @apply flex
+  mt-2
+  items-center
+  justify-center
+  focus:outline-none 
+  text-white
+  text-sm
+  sm:text-base
+  bg-emerald-700
+  hover:bg-emerald-950
+  rounded-md
+  py-2
+  w-full
+  transition
+  duration-150
+  ease-in;
+}

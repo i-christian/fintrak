@@ -55,7 +55,7 @@ export default function Register() {
       class="px-5 min-h-screen flex flex-col items-center justify-center bg-gray-100"
       onSubmit={handleSubmit}
     >
-      <div class="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-50 max-w-md">
+      <div class="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-lg w-50 max-w-md">
         <h1 class="lg:text-2xl text-xl text-center">Create an Account</h1>
         {error() && (
           <p class="mt-4 text-center text-red-600 text-sm animate-bounce">
@@ -75,7 +75,6 @@ export default function Register() {
               required
               value={name()}
               onInput={(e: InputEvent) => setName(e.target.value)}
-              placeholder="Enter your name"
             />
           </div>
 
@@ -90,7 +89,6 @@ export default function Register() {
               required
               value={email()}
               onInput={(e: InputEvent) => setEmail(e.target.value)}
-              placeholder="Enter your email"
             />
           </div>
 
@@ -139,7 +137,7 @@ export default function Register() {
           <div class="flex w-full">
             <button
               type="submit"
-              class="flex mt-2 items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-slate-800 hover:bg-slate-950 rounded-md py-2 w-full transition duration-150 ease-in"
+              class="btn"
             >
               <span class="mr-2 uppercase">Sign Up &rarr;</span>
             </button>
