@@ -16,9 +16,23 @@ const OverViewChart: Component = () => {
     ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
   });
 
-  // let months = [
-  //   "January", "Feb"
-  // ]
+  const calculateMonths = () => {
+    let months = [
+      "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    ]
+
+    let today = new Date();
+    let currentMonths: String[] = []
+
+    for (let i = 5; i >= 0; i -= 1) {
+      let currentDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      currentMonths.push(months[currentDate.getMonth()]);
+    }
+
+    return currentMonths;
+  }
+
+  const labels = calculateMonths();
 
   const options = {
     responsive: true,
@@ -40,7 +54,6 @@ const OverViewChart: Component = () => {
     },
   };
 
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June'];
 
   const chartdata = {
     labels,
