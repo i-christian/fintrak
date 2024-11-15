@@ -1,9 +1,15 @@
 import { ParentComponent } from "solid-js";
 import SideBar from "../components/SideBar";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
+import { isLoggedIn } from "../index";
 
 
 const Home: ParentComponent = (props) => {
+  let navigate = useNavigate();
+  if (!isLoggedIn()) {
+    navigate("/login")
+  }
+
   return (
     <div class="primary_bg flex h-svh justify-center">
       <SideBar />
