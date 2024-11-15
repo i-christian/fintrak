@@ -1,5 +1,5 @@
 import { Component, Match, Suspense, Switch, createResource } from "solid-js"
-import { useNavigate } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import { setIsLoggedIn } from "../index";
 import { getUser } from "../hooks/useFetch";
 
@@ -31,6 +31,7 @@ const SideBar: Component = () => {
   return (
     <aside class="w-1/4 bg-emerald-900 p-4 ">
       <h2 class="text-xl text-center">
+        <span>Welcome, </span>
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
             <Match when={user.error}>
@@ -42,17 +43,17 @@ const SideBar: Component = () => {
           </Switch>
         </Suspense>
       </h2>
-
-      <nav class="flex flex-col gap-2">
-        <p>Budget </p>
+      <hr class="my-5" />
+      <nav class="flex flex-col bg-emerald-100 shadow-inner rounded-lg px-5 py-5 gap-2">
+        <A href="/Budget" class="link">Budget </A>
         <p>Transactions</p>
         <p>Income </p>
         <p>Expenses </p>
         <p>Reports</p>
-        <p>User Settings </p>
+        <p>Settings </p>
       </nav>
       <hr class="my-5 botton-0" />
-      <button onClick={logout} class="mb-4 p-2 bg-red-500 text-white rounded-lg">
+      <button onClick={logout} class="py-2 px-5 bg-red-500 text-white hover:bg-red-900 rounded-lg">
         Logout
       </button>
 

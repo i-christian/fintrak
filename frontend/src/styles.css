@@ -19,6 +19,13 @@ html {
   @apply bg-emerald-500;
 }
 
+.link {
+  @apply text-blue-900
+  text-lg
+  visited:text-purple-600
+  hover:underline;
+}
+
 .btn {
   @apply flex
   mt-2
