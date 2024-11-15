@@ -20,10 +20,10 @@ html {
 }
 
 .link {
-  @apply text-blue-900
+  @apply text-blue-800
   text-lg
-  visited:text-purple-600
-  hover:underline;
+  hover:underline
+  hover:text-purple-600;
 }
 
 .btn {
