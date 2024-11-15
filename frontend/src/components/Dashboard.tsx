@@ -4,8 +4,12 @@ import OverViewChart from "./OverViewChart";
 const Dashboard: Component = () => {
   return (
     <section>
-      <header>Your overview</header>
-      <OverViewChart />
+      <h2 class="text-xl text-end mx-auto my-5">Balance: 100</h2>
+
+      <div class="">
+        <p class="text-center text-sm my-2">Expense/Income Overview </p>
+        <OverViewChart />
+      </div>
     </section>
   )
 }

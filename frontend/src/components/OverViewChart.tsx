@@ -59,7 +59,7 @@ const OverViewChart: Component = () => {
     labels,
     datasets: [
       {
-        label: 'Expenses - Last 6 Months',
+        label: 'Expenses',
         data: [100, 300, 200, 100, 200, 400],
         borderColor: '#B51021',
         backgroundColor: '#B51021',
@@ -68,7 +68,7 @@ const OverViewChart: Component = () => {
       },
 
       {
-        label: 'Income - Last 6 Months',
+        label: 'Income',
         data: [50, 100, 250, 50, 200, 300],
         borderColor: '#070ab5',
         backgroundColor: '#070ab5',
