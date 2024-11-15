@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Forbidden from "./pages/403";
 import WrongPage from "./pages/404";
+import Dashboard from "./components/Dashboard";
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
@@ -36,12 +37,14 @@ const App: Component = () => {
 
   return (
     <Router>
-      <Route path="/" component={() => isLoggedIn() ? <Home /> : <Navigate href="/login" />} />
+      <Route path="/" component={Home}>
+        <Route path="/" component={Dashboard} />
+      </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="/403" component={Forbidden} />
       <Route path="*" component={WrongPage} />
-    </Router>
+    </Router >
   );
 };
 
