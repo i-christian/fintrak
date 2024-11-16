@@ -4,7 +4,6 @@ import { Component, createSignal, onMount } from "solid-js";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Forbidden from "./pages/403";
 import WrongPage from "./pages/404";
 import Dashboard from "./components/Dashboard";
 
@@ -42,7 +41,6 @@ const App: Component = () => {
       </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
-      <Route path="/403" component={Forbidden} />
       <Route path="*" component={WrongPage} />
     </Router >
   );

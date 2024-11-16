@@ -13,7 +13,7 @@ const Home: ParentComponent = (props) => {
   }
 
   return (
-    <div class="primary_bg flex h-svh justify-center lg:ml-64">
+    <div class="primary_bg flex te h-svh justify-center lg:ml-64">
       <SideBar open={open} setOpen={setOpen} />
       <main class="flex-grow transition-all duration-500 overflow-y-auto mx-auto">
         <header class="flex justify-between mx-5 p-2">
