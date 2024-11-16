@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WrongPage from "./pages/404";
 import Dashboard from "./components/Dashboard";
+import Settings from "./pages/Settings";
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
@@ -38,6 +39,9 @@ const App: Component = () => {
     <Router>
       <Route path="/" component={Home}>
         <Route path="/" component={Dashboard} />
+      </Route>
+      <Route path="/settings" component={Home}>
+        <Route path="/" component={Settings} />
       </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
