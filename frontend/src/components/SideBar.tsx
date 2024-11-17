@@ -91,12 +91,6 @@ const SideBar: Component<{
         <A href="/transactions" class="link">
           Transactions{" "}
         </A>
-        <A href="/income" class="link">
-          Income{" "}
-        </A>
-        <A href="/expenses" class="link">
-          Expenses{" "}
-        </A>
         <A href="/reports" class="link">
           Reports{" "}
         </A>
