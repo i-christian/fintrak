@@ -7,7 +7,7 @@ const Settings: Component = () => {
     <main class="mt-10 flex flex-col gap-5">
       <div class="shadow-2xl border p-5 rounded-2xl">
         <section>
-          <p>Change Name </p>
+          <p class="font-bold text-xl">Change Name </p>
           <div class={`flex flex-row gap-5 ${open() ? "hidden" : "block"} `}>
             <span class="text-xl py-2">User1</span>
             <button onClick={() => setOpen(!open())}>
@@ -30,7 +30,7 @@ const Settings: Component = () => {
           <form class={`flex flex-row gap-5 ${!open() ? "hidden" : "block"} `}>
             <label for="name">
               New Name:
-              <input id="name" class="ml-2 rounded-md border" type="text" />
+              <input id="name" class="ml-2 p-1 rounded-md border" type="text" />
             </label>
             <button
               class="bg-emerald-600 hover:bg-emerald-900 rounded-md px-5 text-white w-fit"
@@ -38,22 +38,44 @@ const Settings: Component = () => {
             >
               Save
             </button>
+            <button
+              class="bg-red-600 hover:bg-red-900 rounded-md px-5 text-white w-fit"
+              onClick={() => setOpen(!open())}
+            >
+              cancel
+            </button>
           </form>
         </section>
         <hr class="my-5" />
+
         <section>
-          <p>Reset Password</p>
+          <p class="font-bold text-xl my-2">Reset Password</p>
           <form class="flex flex-col">
             <label for="password">
-              Password:
-              <input id="password" type="text" />
+              <input
+                id="password"
+                class="p-1 rounded-md border"
+                type="text"
+                placeholder="new password"
+              />
             </label>
             <br />
             <label for="confirm">
-              Password:
-              <input id="confirm" type="text" />
+              <input
+                id="confirm"
+                class="p-1 rounded-md border"
+                type="text"
+                placeholder="Confirm Password"
+              />
             </label>
-            <button class="btn">Save</button>
+            <div class="flex gap-5 ml-2">
+              <button class="rounded-md bg-emerald-600 hover:bg-emerald-900 my-2 w-fit px-5">
+                Save
+              </button>
+              <button class="rounded-md bg-red-600 hover:bg-red-900 my-2 w-fit px-5">
+                cancel
+              </button>
+            </div>
           </form>
         </section>
       </div>
