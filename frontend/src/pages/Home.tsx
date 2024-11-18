@@ -3,13 +3,12 @@ import SideBar from "../components/SideBar";
 import { A, useNavigate } from "@solidjs/router";
 import { isLoggedIn } from "../index";
 
-
 const Home: ParentComponent = (props) => {
   const [open, setOpen] = createSignal<boolean>(false);
 
   let navigate = useNavigate();
   if (!isLoggedIn()) {
-    navigate("/login")
+    navigate("/login");
   }
 
   return (

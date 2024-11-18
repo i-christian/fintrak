@@ -1,4 +1,5 @@
-import { Component, createSignal } from "solid-js";
+import { Component, createSignal, Match, Suspense, Switch } from "solid-js";
+import { user } from "../index";
 
 const Settings: Component = () => {
   const [openEdit, setOpenEdit] = createSignal<boolean>(false);
@@ -12,7 +13,18 @@ const Settings: Component = () => {
           <div
             class={`flex flex-row gap-5 ${openEdit() ? "hidden" : "block"} `}
           >
-            <span class="text-xl py-2">User1</span>
+            <span class="text-xl py-2">
+              <Suspense fallback={<div>Loading...</div>}>
+                <Switch>
+                  <Match when={user.error}>
+                    <span>Anonymous User</span>
+                  </Match>
+                  <Match when={user()}>
+                    <p>{user().name}</p>
+                  </Match>
+                </Switch>
+              </Suspense>
+            </span>
             <button onClick={() => setOpenEdit(!openEdit())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +101,18 @@ const Settings: Component = () => {
         <div
           class={`flex flex-row gap-5 ${openDelete() ? "hidden" : "block"} `}
         >
-          <span class="text-xl py-2">User1</span>
+          <span class="text-xl py-2">
+            <Suspense fallback={<div>Loading...</div>}>
+              <Switch>
+                <Match when={user.error}>
+                  <span>Anonymous User</span>
+                </Match>
+                <Match when={user()}>
+                  <p>{user().name}</p>
+                </Match>
+              </Switch>
+            </Suspense>
+          </span>
           <button onClick={() => setOpenDelete(!openDelete())}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
