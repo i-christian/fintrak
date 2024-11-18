@@ -1,15 +1,17 @@
 import { render } from "solid-js/web";
 import { Route, Router, Navigate } from "@solidjs/router";
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, createResource, createSignal, onMount } from "solid-js";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WrongPage from "./pages/404";
 import Dashboard from "./components/Dashboard";
 import Settings from "./pages/Settings";
+import { getUser } from "./hooks/useFetch";
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
+export const [user] = createResource(getUser);
 
 const App: Component = () => {
   // onMount(async () => {
@@ -46,7 +48,7 @@ const App: Component = () => {
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
       <Route path="*" component={WrongPage} />
-    </Router >
+    </Router>
   );
 };
 
