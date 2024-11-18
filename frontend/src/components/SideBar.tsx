@@ -1,22 +1,12 @@
-import {
-  Accessor,
-  Component,
-  Match,
-  Setter,
-  Suspense,
-  Switch,
-  createResource,
-} from "solid-js";
+import { Accessor, Component, Match, Setter, Suspense, Switch } from "solid-js";
 import { A, useNavigate } from "@solidjs/router";
-import { setIsLoggedIn } from "../index";
-import { getUser } from "../hooks/useFetch";
+import { setIsLoggedIn, user } from "../index";
 
 const SideBar: Component<{
   open: Accessor<boolean>;
   setOpen: Setter<boolean>;
 }> = (props) => {
   const navigate = useNavigate();
-  const [user] = createResource(getUser);
 
   const logout = async () => {
     try {
@@ -72,7 +62,7 @@ const SideBar: Component<{
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
             <Match when={user.error}>
-              <span>Error: {user.error.message}</span>
+              <span>Anonymous User</span>
             </Match>
             <Match when={user()}>
               <p>{user().name}</p>
