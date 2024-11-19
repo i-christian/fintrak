@@ -27,7 +27,6 @@ Built with a modern tech stack, FinTrak utilizes Rust for its high-performance b
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
 - [Axum](https://docs.rs/axum/latest/axum/)
-- [The WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 - [Node.js & npm](https://nodejs.org/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [SolidJS](https://docs.solidjs.com/)
