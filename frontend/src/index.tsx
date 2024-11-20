@@ -8,6 +8,7 @@ import WrongPage from "./pages/404";
 import Dashboard from "./components/Dashboard";
 import Settings from "./pages/Settings";
 import { getUser } from "./hooks/useFetch";
+import Budget from "./pages/Budget";
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
@@ -44,6 +45,9 @@ const App: Component = () => {
       </Route>
       <Route path="/settings" component={Home}>
         <Route path="/" component={Settings} />
+      </Route>
+      <Route path="/budget" component={Home}>
+        <Route path="/" component={Budget} />
       </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
