@@ -5,6 +5,7 @@ const Budget: Component = () => {
     <main>
       <button class="btn">New </button>
       <p>View Current budget </p>
+      <p>List previous budgets </p>
     </main>
   );
 };

@@ -75,6 +75,10 @@ const SideBar: Component<{
         <A href="/" class="link">
           Home{" "}
         </A>
+        <A href="/categories" class="link">
+          Categories
+        </A>
+
         <A href="/budget" class="link">
           Budget{" "}
         </A>

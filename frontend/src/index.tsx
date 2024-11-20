@@ -9,6 +9,7 @@ import Dashboard from "./components/Dashboard";
 import Settings from "./pages/Settings";
 import { getUser } from "./hooks/useFetch";
 import Budget from "./pages/Budget";
+import Categories from "./pages/Categories";
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
@@ -48,6 +49,9 @@ const App: Component = () => {
       </Route>
       <Route path="/budget" component={Home}>
         <Route path="/" component={Budget} />
+      </Route>
+      <Route path="/categories" component={Home}>
+        <Route path="/" component={Categories} />
       </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
