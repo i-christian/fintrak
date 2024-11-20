@@ -38,7 +38,13 @@ const Budget: Component = () => {
         </tbody>
       </table>
 
-      <p>List previous budgets </p>
+      <section class="my-5">
+        <h1 class="font-bold text-xl text-center">List previous budgets </h1>
+        <p>list of previous budgets sorted by date</p>
+        <ul>
+          <li>recent budget</li>
+        </ul>
+      </section>
     </main>
   );
 };
