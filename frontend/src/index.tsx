@@ -1,15 +1,23 @@
 import { render } from "solid-js/web";
 import { Route, Router, Navigate } from "@solidjs/router";
-import { Component, createResource, createSignal, onMount } from "solid-js";
-import Home from "./pages/Home";
+import {
+  Component,
+  createResource,
+  createSignal,
+  lazy,
+  onMount,
+} from "solid-js";
+import { getUser } from "./hooks/useFetch";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import WrongPage from "./pages/404";
-import Dashboard from "./components/Dashboard";
-import Settings from "./pages/Settings";
-import { getUser } from "./hooks/useFetch";
-import Budget from "./pages/Budget";
-import Categories from "./pages/Categories";
+
+const Home = lazy(() => import("./pages/Home"));
+const WrongPage = lazy(() => import("./pages/404"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Budget = lazy(() => import("./pages/Budget"));
+const Categories = lazy(() => import("./pages/Categories"));
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
