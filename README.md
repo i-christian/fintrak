@@ -20,9 +20,9 @@ Built with a modern tech stack, FinTrak utilizes Rust for its high-performance b
 - [ ] **Personal Management**: Create and track expenses & income throughout the month.
 - [ ] **Category Management**: Define custom income and expense categories for users.
 - [ ] **Transaction Tracking**: Log and manage transactions for individuals, categorized as expense or income.
+- [ ] **Cross-Platform Accessibility**: A responsive, dynamic UI that works seamlessly across all devices.
 - [ ] **Budget Management**: Set and monitor budgets for specific categories per user.
 - [ ] **Financial Reports**: Generate summaries of income, expenses, and budget performance for specific time periods.
-- [ ] **Cross-Platform Accessibility**: A responsive, dynamic UI that works seamlessly across all devices.
 
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
