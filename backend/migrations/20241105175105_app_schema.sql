@@ -17,15 +17,24 @@ CREATE TABLE IF NOT EXISTS sessions (
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Create Transaction Types Table
+CREATE TABLE IF NOT EXISTS transaction_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE CHECK (name IN ('expense', 'income'))
+);
+
 -- Create Categories Table
 CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     name VARCHAR(100) NOT NULL,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('expense', 'income')),
+    type_id INT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE (user_id, name, type)
+    CONSTRAINT fk_type FOREIGN KEY (type_id) REFERENCES transaction_types(id),
+    UNIQUE (user_id, name, type_id)
 );
 
 -- Create Transactions Table
@@ -34,59 +43,37 @@ CREATE TABLE IF NOT EXISTS transactions (
     user_id UUID NOT NULL,
     category_id UUID NOT NULL,
     amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
+    currency CHAR(3) DEFAULT 'MWK' CHECK (length(currency) = 3),
     transaction_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('expense', 'income')),
+    type_id INT NOT NULL,
     notes TEXT,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
-
--- Create Budgets Table
-CREATE TABLE IF NOT EXISTS budgets (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    category_id UUID NOT NULL,
-    amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    UNIQUE (user_id, category_id, start_date, end_date)
+    CONSTRAINT fk_type FOREIGN KEY (type_id) REFERENCES transaction_types(id)
 );
 
--- Create Report Types Table
-CREATE TABLE IF NOT EXISTS report_types (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
--- Create Reports Table
-CREATE TABLE IF NOT EXISTS reports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    report_type_id INT NOT NULL REFERENCES report_types(id),
-    generated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    data JSONB NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Insert Initial Report Types
-INSERT INTO report_types (name)
-SELECT name
-FROM (VALUES ('expense'), ('income'), ('overview')) AS t(name)
-WHERE NOT EXISTS (
-    SELECT 1 FROM report_types rt WHERE rt.name = t.name
-);
-
--- Create Indexes
-CREATE INDEX IF NOT EXISTS idx_reports_report_type_id ON reports(report_type_id);
-CREATE INDEX IF NOT EXISTS idx_budgets_category_id ON budgets(category_id);
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
-CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
+CREATE INDEX IF NOT EXISTS idx_transactions_type_id ON transactions(type_id);
 CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON sessions(session_id);
+
+-- Materialized View for Last 6 Months Graph Data
+-- Need to execute this query after a transaction: REFRESH MATERIALIZED VIEW last_6_months_transactions
+CREATE MATERIALIZED VIEW last_6_months_transactions AS
+SELECT 
+    user_id, 
+    type_id, 
+    DATE_TRUNC('month', transaction_date) AS month, 
+    SUM(amount) AS total
+FROM 
+    transactions
+WHERE 
+    transaction_date >= NOW() - INTERVAL '6 months'
+GROUP BY 
+    user_id, type_id, DATE_TRUNC('month', transaction_date);
