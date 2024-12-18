@@ -16,7 +16,6 @@ const Home = lazy(() => import("./pages/Home"));
 const WrongPage = lazy(() => import("./pages/404"));
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const Settings = lazy(() => import("./pages/Settings"));
-const Budget = lazy(() => import("./pages/Budget"));
 const Categories = lazy(() => import("./pages/Categories"));
 
 //should be set to false
@@ -54,9 +53,6 @@ const App: Component = () => {
       </Route>
       <Route path="/settings" component={Home}>
         <Route path="/" component={Settings} />
-      </Route>
-      <Route path="/budget" component={Home}>
-        <Route path="/" component={Budget} />
       </Route>
       <Route path="/categories" component={Home}>
         <Route path="/" component={Categories} />
