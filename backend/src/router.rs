@@ -35,7 +35,7 @@ pub fn create_api_router(state: AppState) -> Router {
 
     Router::new()
         // nest protected routes here
-        .nest("/categories", get_categories)
+        .nest("/categories", categories)
         .route("/check", get(auth_check))
         .layer(middleware::from_fn_with_state(
             state.clone(),
