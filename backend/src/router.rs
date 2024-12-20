@@ -1,7 +1,7 @@
 use crate::AppState;
 use axum::{
     http, middleware,
-    routing::{get, post},
+    routing::{get, post, put},
     Router,
 };
 use http::HeaderValue;
@@ -15,7 +15,7 @@ use tower_http::cors::CorsLayer;
 use crate::auth::{
     delete_user, edit_user, get_all_users, get_user, login, logout, register, validate_session,
 };
-use crate::categories::{create_category, get_categories};
+use crate::categories::{create_category, edit_category, get_categories};
 
 pub fn create_api_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
