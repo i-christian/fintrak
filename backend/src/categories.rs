@@ -1,4 +1,8 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    Json,
+};
 use axum_extra::extract::PrivateCookieJar;
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -14,7 +18,7 @@ pub struct CategoryInfo {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CreateCategoryRequest {
+pub struct CategoryRequest {
     pub name: String,
     pub transaction_type: String,
 }
@@ -50,7 +54,7 @@ pub async fn get_categories(
 pub async fn create_category(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
-    Json(request): Json<CreateCategoryRequest>,
+    Json(request): Json<CategoryRequest>,
 ) -> impl IntoResponse {
     let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
         return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
@@ -78,6 +82,32 @@ pub async fn create_category(
 // PUT /categories/{id}
 // we can change the category name, and type_id (transaction type)
 //return success or failure status
+pub async fn edit_category(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(update): Json<CategoryRequest>,
+) -> impl IntoResponse {
+    let type_id: Option<String> =
+        sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
+            .bind(update.transaction_type)
+            .fetch_optional(&state.postgres)
+            .await
+            .expect("Failed to find transaction type");
+
+    let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id) WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
+
+    match query.await {
+        Ok(result) if result.rows_affected() > 0 => {
+            (StatusCode::OK, "Category update successfully").into_response()
+        }
+        Ok(_) => (StatusCode::NOT_FOUND, "Category not found!").into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to update category",
+        )
+            .into_response(),
+    }
+}
 
 // DELETE /categories/{id}
 // we can delete the category for the user

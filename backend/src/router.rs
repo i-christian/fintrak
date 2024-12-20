@@ -26,7 +26,8 @@ pub fn create_api_router(state: AppState) -> Router {
 
     let categories = Router::new()
         .route("/", get(get_categories))
-        .route("/", post(create_category));
+        .route("/", post(create_category))
+        .route("/:id", put(edit_category));
 
     let auth_router = Router::new()
         .route("/register", post(register))
