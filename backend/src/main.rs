@@ -8,7 +8,10 @@ use sqlx::{postgres::PgPoolOptions, PgPool};
 use tower_http::services::{ServeDir, ServeFile};
 
 mod auth;
+mod categories;
+mod insights;
 mod router;
+mod transactions;
 
 #[cfg(test)]
 mod tests;
