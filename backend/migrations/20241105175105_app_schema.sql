@@ -55,6 +55,12 @@ CREATE TABLE IF NOT EXISTS transactions (
     CONSTRAINT fk_type FOREIGN KEY (type_id) REFERENCES transaction_types(id)
 );
 
+-- Insert default transaction types
+INSERT INTO transaction_types (name) VALUES 
+('income'), 
+('expense')
+ON CONFLICT (name) DO NOTHING;
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
