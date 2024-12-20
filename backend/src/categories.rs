@@ -13,6 +13,12 @@ pub struct CategoryInfo {
     pub name: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct CreateCategoryRequest {
+    pub name: String,
+    pub transaction_type: String,
+}
+
 // GET /categories
 // list all categories for the authenticated user
 pub async fn get_categories(
@@ -40,10 +46,34 @@ pub async fn get_categories(
 }
 
 // POST /categories
-//create a new category
-// -check for type_id validity by first retrieving the id using name (income or expense). Use that id ans type_id when creating a category by binding it to insert statement
-// - return success or failure status
-// - on success also return the new category id
+//creates a new category
+pub async fn create_category(
+    State(state): State<AppState>,
+    jar: PrivateCookieJar,
+    Json(request): Json<CreateCategoryRequest>,
+) -> impl IntoResponse {
+    let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
+        return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
+    };
+
+    let type_id: Option<String> =
+        sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
+            .bind(request.transaction_type)
+            .fetch_optional(&state.postgres)
+            .await
+            .expect("Failed to find transaction type");
+
+    let query = sqlx::query("INSERT INTO categories (user_id, name, type_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",).bind(user_id).bind(request.name).bind(type_id).execute(&state.postgres);
+
+    match query.await {
+        Ok(_) => (StatusCode::OK, "Category created successfully").into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to create category: {}", e),
+        )
+            .into_response(),
+    }
+}
 
 // PUT /categories/{id}
 // we can change the category name, and type_id (transaction type)
