@@ -1,4 +1,8 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    Json,
+};
 use axum_extra::extract::{PrivateCookieJar, Query};
 use bigdecimal::BigDecimal;
 use http::StatusCode;
@@ -21,6 +25,7 @@ pub struct TransactionRequest {
 
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct TransactionInfo {
+    pub trans_id: Uuid,
     #[serde(with = "time::serde::iso8601")]
     pub transaction_date: time::OffsetDateTime,
     #[serde(with = "bigdecimal::serde::json_num")]
@@ -96,6 +101,7 @@ pub async fn get_transactions(
     let query = sqlx::query_as::<_, TransactionInfo>(
         "
         SELECT
+            transactions.id AS trans_id,
             transactions.transaction_date,
             transactions.amount,
             transactions.notes,
@@ -156,6 +162,7 @@ pub async fn get_transactions_by_date(
     let query = sqlx::query_as::<_, TransactionInfo>(
         "
         SELECT
+            transactions.id AS trans_id,
             transactions.transaction_date,
             transactions.amount,
             transactions.notes,
@@ -253,9 +260,27 @@ pub async fn get_transactions_totals(
 // // Behavior:
 // // Update the transaction record with the new values.
 
-// // DELETE /transactions/{id}
-// // Purpose: Delete a specific transaction.
-// // Validations:
-// // Ensure the transaction belongs to the authenticated user.
-// // Behavior:
-// // Remove the transaction from the database.
+/// # DELETE /transactions/{id}
+/// Purpose: Delete a specific transaction.
+///Behavior:
+/// Remove the transaction from the database.
+pub async fn delete_transaction(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> impl IntoResponse {
+    let query = sqlx::query("DELETE FROM categories WHERE id = $1")
+        .bind(id)
+        .execute(&state.postgres);
+
+    match query.await {
+        Ok(result) if result.rows_affected() > 0 => {
+            (StatusCode::OK, "Transaction deleted successfully").into_response()
+        }
+        Ok(_) => (StatusCode::NOT_FOUND, "Transaction not founf!").into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to delete transaction",
+        )
+            .into_response(),
+    }
+}
