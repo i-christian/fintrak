@@ -18,6 +18,7 @@ pub struct TransactionRequest {
 
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct TransactionInfo {
+    #[serde(with = "time::serde::iso8601")]
     pub transaction_date: time::OffsetDateTime,
     #[serde(with = "bigdecimal::serde::json_num")]
     pub amount: BigDecimal,
