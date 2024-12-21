@@ -1,7 +1,7 @@
 use crate::AppState;
 use axum::{
     http, middleware,
-    routing::{delete, get, post, put},
+    routing::{get, post, put},
     Router,
 };
 use http::HeaderValue;
@@ -17,8 +17,8 @@ use crate::auth::{
 };
 use crate::categories::{create_category, delete_category, edit_category, get_categories};
 use crate::transactions::{
-    create_transaction, delete_transaction, get_transactions, get_transactions_by_date,
-    get_transactions_totals,
+    create_transaction, delete_transaction, edit_transaction, get_transactions,
+    get_transactions_by_date, get_transactions_totals,
 };
 
 pub fn create_api_router(state: AppState) -> Router {
@@ -37,7 +37,7 @@ pub fn create_api_router(state: AppState) -> Router {
         .route("/", get(get_transactions).post(create_transaction))
         .route("/by_date", get(get_transactions_by_date))
         .route("/totals", get(get_transactions_totals))
-        .route("/:id", delete(delete_transaction));
+        .route("/:id", put(edit_transaction).delete(delete_transaction));
 
     let auth_router = Router::new()
         .route("/register", post(register))

@@ -99,7 +99,7 @@ pub async fn create_category(
     }
 }
 
-// PUT /categories/{id}
+// # PUT /categories/{id}
 // we can change the category name, and type_id (transaction type)
 //return success or failure status
 pub async fn edit_category(
@@ -107,12 +107,11 @@ pub async fn edit_category(
     Path(id): Path<Uuid>,
     Json(update): Json<CategoryRequest>,
 ) -> impl IntoResponse {
-    let type_id: Option<String> =
-        sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
-            .bind(update.transaction_type.to_lowercase())
-            .fetch_optional(&state.postgres)
-            .await
-            .expect("Failed to find transaction type");
+    let type_id: i32 = sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
+        .bind(update.transaction_type.to_lowercase())
+        .fetch_one(&state.postgres)
+        .await
+        .expect("Failed to find transaction type");
 
     let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id) WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
 

@@ -23,6 +23,15 @@ pub struct TransactionRequest {
     pub notes: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct UpdateRequest {
+    pub category_name: String,
+    pub transaction_type: String,
+    #[serde(with = "bigdecimal::serde::json_num")]
+    pub amount: BigDecimal,
+    pub notes: String,
+}
+
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct TransactionInfo {
     pub trans_id: Uuid,
@@ -252,17 +261,59 @@ pub async fn get_transactions_totals(
     }
 }
 
-// // PUT /transactions/{id}
-// // Purpose: Update an existing transaction.
-// // Validations:
-// // Ensure the transaction belongs to the authenticated user.
-// // Validate category_id and type_id if updated.
-// // Behavior:
-// // Update the transaction record with the new values.
+/// # PUT /transactions/{id}
+/// ## Purpose: Update an existing transaction.
+/// ## Behavior: Update the transaction record with the new values.
+pub async fn edit_transaction(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(update): Json<UpdateRequest>,
+) -> impl IntoResponse {
+    let type_id: i32 = sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
+        .bind(update.transaction_type.to_lowercase())
+        .fetch_one(&state.postgres)
+        .await
+        .expect("Failed to find transaction type");
+
+    let category_id: i32 = sqlx::query_scalar("SELECT id FROM categories WHERE name = $1")
+        .bind(update.category_name)
+        .fetch_one(&state.postgres)
+        .await
+        .expect("Failed to find transaction type");
+
+    let query = sqlx::query(
+        "
+        UPDATE transactions
+        SET 
+            category_id = COALESCE($1, category_id),
+            type_id = COALESCE($2, type_id),
+            amount = COALESCE($3, amount),
+            notes = COALESCE($4, notes),
+        WHERE id = $5",
+    )
+    .bind(category_id)
+    .bind(type_id)
+    .bind(update.amount)
+    .bind(update.notes)
+    .bind(id)
+    .execute(&state.postgres);
+
+    match query.await {
+        Ok(result) if result.rows_affected() > 0 => {
+            (StatusCode::OK, "Transaction update successfully").into_response()
+        }
+        Ok(_) => (StatusCode::NOT_FOUND, "Transaction not found!").into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to update transaction",
+        )
+            .into_response(),
+    }
+}
 
 /// # DELETE /transactions/{id}
-/// Purpose: Delete a specific transaction.
-///Behavior:
+/// ## Purpose: Delete a specific transaction.
+///## Behavior:
 /// Remove the transaction from the database.
 pub async fn delete_transaction(
     State(state): State<AppState>,
