@@ -93,8 +93,9 @@ pub async fn edit_category(
             .fetch_optional(&state.postgres)
             .await
             .expect("Failed to find transaction type");
+    // let update_time =
 
-    let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id) WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
+    let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id), updated_at =  WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
 
     match query.await {
         Ok(result) if result.rows_affected() > 0 => {
@@ -112,3 +113,23 @@ pub async fn edit_category(
 // DELETE /categories/{id}
 // we can delete the category for the user
 // return success or failure status
+pub async fn delete_category(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> impl IntoResponse {
+    let query = sqlx::query("DELETE FROM categories WHERE id = $1")
+        .bind(id)
+        .execute(&state.postgres);
+
+    match query.await {
+        Ok(result) if result.rows_affected() > 0 => {
+            (StatusCode::OK, "Category deleted successfully").into_response()
+        }
+        Ok(_) => (StatusCode::NOT_FOUND, "Category not found!").into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to delete category",
+        )
+            .into_response(),
+    }
+}
