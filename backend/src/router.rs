@@ -16,7 +16,9 @@ use crate::auth::{
     delete_user, edit_user, get_all_users, get_user, login, logout, register, validate_session,
 };
 use crate::categories::{create_category, delete_category, edit_category, get_categories};
-use crate::transactions::{create_transaction, get_transactions, get_transactions_by_date};
+use crate::transactions::{
+    create_transaction, get_transactions, get_transactions_by_date, get_transactions_totals,
+};
 
 pub fn create_api_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
@@ -32,7 +34,8 @@ pub fn create_api_router(state: AppState) -> Router {
 
     let transactions = Router::new()
         .route("/", get(get_transactions).post(create_transaction))
-        .route("/by_date", get(get_transactions_by_date));
+        .route("/by_date", get(get_transactions_by_date))
+        .route("/totals", get(get_transactions_totals));
 
     let auth_router = Router::new()
         .route("/register", post(register))

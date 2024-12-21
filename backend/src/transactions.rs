@@ -37,6 +37,15 @@ pub struct Params {
     pub year: Option<i32>,
     pub month: Option<u32>,
 }
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct TransactionTotals {
+    pub category_name: String,
+    pub transaction_type: String,
+    #[serde(with = "bigdecimal::serde::json_num")]
+    pub total_amount: BigDecimal,
+}
+
 /// Handles creating a new transaction.
 ///
 /// # POST /transactions
@@ -184,31 +193,57 @@ pub async fn get_transactions_by_date(
     }
 }
 
-// // GET /transactions/totals
-// // Purpose: Retrieve total transaction amounts for each category for the authenticated user.
-// // Behavior:
-// // Aggregate transactions by category_id for that month.
-// // Include totals grouped by type_id for each category
-/*
-SELECT
-    categories.name AS category_name,
-    transaction_types.name AS transaction_type,
-    SUM(transactions.amount) AS total_amount
-FROM
-    transactions
-JOIN
-    categories ON transactions.category_id = categories.id
-JOIN
-    transaction_types ON transactions.type_id = transaction_types.id
-WHERE
-    transactions.transaction_date >= DATE_TRUNC('month', CURRENT_DATE)
-    AND transactions.transaction_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
-    AND transactions.user_id = '6dbcc6d4-367d-444a-885a-bf9d136964bf'
-GROUP BY
-    categories.name, transaction_types.name
-ORDER BY
-    SUM(transactions.amount) DESC;
-*/
+/// Handles default transactions retrieval.
+///
+/// # GET /transactions/totals
+///
+/// ## Purpose
+/// Retrieve total transaction amounts for each category for the authenticated user
+pub async fn get_transactions_totals(
+    State(state): State<AppState>,
+    jar: PrivateCookieJar,
+) -> impl IntoResponse {
+    let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
+        return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
+    };
+
+    let query = sqlx::query_as::<_, TransactionTotals>(
+        "
+        SELECT
+            categories.name AS category_name,
+            transaction_types.name AS transaction_type,
+            SUM(transactions.amount) AS total_amount
+        FROM
+            transactions
+        JOIN
+            categories ON transactions.category_id = categories.id
+        JOIN
+            transaction_types ON transactions.type_id = transaction_types.id
+        WHERE
+            transactions.transaction_date >= DATE_TRUNC('month', CURRENT_DATE)
+        AND
+            transactions.transaction_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+        AND
+            transactions.user_id = $1
+        GROUP BY
+            categories.name, transaction_types.name
+        ORDER BY
+            SUM(transactions.amount) DESC;
+        ",
+    )
+    .bind(user_id)
+    .fetch_all(&state.postgres)
+    .await;
+
+    match query {
+        Ok(categories) => Json(categories).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to retrieve transactions totals: {}", e),
+        )
+            .into_response(),
+    }
+}
 
 // // PUT /transactions/{id}
 // // Purpose: Update an existing transaction.
