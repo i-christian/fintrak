@@ -33,11 +33,28 @@ pub async fn get_categories(
         return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
     };
 
-    let query =
-        sqlx::query_as::<_, CategoryInfo>("SELECT id, name FROM categories WHERE user_id = $1")
-            .bind(user_id)
-            .fetch_all(&state.postgres)
-            .await;
+    let query = sqlx::query_as::<_, CategoryInfo>(
+        "
+            SELECT
+                categories.name AS category_name,
+                transaction_types.name AS transaction_type
+            FROM
+                categories
+            JOIN
+                transaction_types
+            ON
+                categories.type_id = transaction_types.id
+            WHERE 
+                user_id = $1
+            GROUP BY 
+                categories.name, transaction_types.name
+            ORDER BY 
+                transaction_types.name, categories.name;
+        ",
+    )
+    .bind(user_id)
+    .fetch_all(&state.postgres)
+    .await;
 
     match query {
         Ok(categories) => Json(categories).into_response(),
@@ -62,7 +79,7 @@ pub async fn create_category(
 
     let type_id: Option<String> =
         sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
-            .bind(request.transaction_type)
+            .bind(request.transaction_type.to_lowercase())
             .fetch_optional(&state.postgres)
             .await
             .expect("Failed to find transaction type");
@@ -89,13 +106,12 @@ pub async fn edit_category(
 ) -> impl IntoResponse {
     let type_id: Option<String> =
         sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
-            .bind(update.transaction_type)
+            .bind(update.transaction_type.to_lowercase())
             .fetch_optional(&state.postgres)
             .await
             .expect("Failed to find transaction type");
-    // let update_time =
 
-    let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id), updated_at =  WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
+    let query = sqlx::query("UPDATE categories SET name = COALESCE($1, name), type_id = COALESCE($2, type_id) WHERE id = $3").bind(&update.name).bind(type_id).bind(id).execute(&state.postgres);
 
     match query.await {
         Ok(result) if result.rows_affected() > 0 => {
