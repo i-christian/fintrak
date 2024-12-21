@@ -1,35 +1,88 @@
-// Once categories are in place, users need to log and view their transactions.
-// Enforce referential integrity with type_id and category_id using queries that validate these foreign keys.
-// Use filters (e.g., query params) to narrow down results by date range, category, or transaction type.
+use axum::{extract::State, response::IntoResponse, Json};
+use axum_extra::extract::PrivateCookieJar;
+use bigdecimal::BigDecimal;
+use http::StatusCode;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-// POST /transactions
-// Create a new transaction (validate that category_id and type_id are valid for the user).
+use crate::{auth::get_user_id, AppState};
 
-// PUT /transactions/{id}
-// Update an existing transaction.
+#[derive(Serialize, Deserialize)]
+pub struct TransactionRequest {
+    pub category_name: String,
+    #[serde(with = "bigdecimal::serde::json_num")]
+    pub amount: BigDecimal,
+    pub notes: String,
+}
 
-// DELETE /transactions/{id}
-// Delete a transaction.
+// // POST /transactions
+// // Purpose: Create a new transaction.
+// // Validations:
+// // Ensure category_id and type_id exist and belong to the authenticated user.
+// // Behavior:
+// // Add the transaction to the database with the appropriate user_id, category_id, type_id, amount, transaction_date, and optional notes.
+pub async fn create_transaction(
+    State(state): State<AppState>,
+    jar: PrivateCookieJar,
+    Json(request): Json<TransactionRequest>,
+) -> impl IntoResponse {
+    let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
+        return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
+    };
 
-// GET /transactions
+    let result: (Uuid, i32) = sqlx::query_as("SELECT id, type_id FROM categories WHERE name = $1")
+        .bind(request.category_name)
+        .fetch_one(&state.postgres)
+        .await
+        .expect("Failed to find category");
 
-// List all transactions for the authenticated user.
-// Optional Filters:
-// Category: Filter by category name (e.g., ?category=Groceries).
-// Type: Filter by transaction type (e.g., ?type=expense or ?type=income).
-// Key Considerations:
+    let query = sqlx::query("INSERT INTO transactions (user_id, category_id, amount, type_id, notes) VALUES ($1, $2, $3, $4, $5)").bind(user_id).bind(result.0).bind(result.1).bind(request.amount).bind(request.notes).execute(&state.postgres);
 
-// Validate that the category filter corresponds to a category the user owns.
-// Validate type against predefined transaction types (expense, income).
-// Ensure proper indexing on user_id, category_id, type_id, and transaction_date for efficient querying.
+    match query.await {
+        Ok(_) => (StatusCode::OK, "Transaction created successfully").into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to add transaction: {}", e),
+        )
+            .into_response(),
+    }
+}
 
-// GET /transactions/{year}/{month}
+// // PUT /transactions/{id}
+// // Purpose: Update an existing transaction.
+// // Validations:
+// // Ensure the transaction belongs to the authenticated user.
+// // Validate category_id and type_id if updated.
+// // Behavior:
+// // Update the transaction record with the new values.
 
-// Fetch all transactions for a specific month and year.
-// Purpose:
-// Simplifies frontend access to monthly transactions without requiring date-range filtering logic on the client.
-// Results are automatically filtered by user_id and sorted by transaction_date.
-// Key Considerations:
+// // DELETE /transactions/{id}
+// // Purpose: Delete a specific transaction.
+// // Validations:
+// // Ensure the transaction belongs to the authenticated user.
+// // Behavior:
+// // Remove the transaction from the database.
 
-// Ensure year and month are valid inputs.
-// Handle edge cases like empty months (return an empty list).
+// // GET /transactions
+// // Purpose: Retrieve transactions for the current month.
+// // Behavior:
+// // Return transactions for the authenticated user, grouped by category_id and type_id, and ordered by transaction_date (latest on top).
+// // Key Features:
+// // Transactions are automatically filtered to only include those from the current month.
+// // Results are grouped for easy categorization and analysis.
+
+// // GET /transactions/{year}/{month}
+// // Purpose: Fetch transactions for a specific past month and year.
+// // Behavior:
+// // Retrieve transactions for the given year and month for the authenticated user.
+// // Results are grouped by category_id and type_id, and ordered by transaction_date (latest on top).
+// // Validations:
+// // Ensure valid year and month inputs.
+// // Edge Case Handling:
+// // Return an empty list if there are no transactions for the specified period.
+
+// // GET /transactions/totals
+// // Purpose: Retrieve total transaction amounts for each category for the authenticated user.
+// // Behavior:
+// // Aggregate transactions by category_id for that month.
+// // Include totals grouped by type_id for each category.

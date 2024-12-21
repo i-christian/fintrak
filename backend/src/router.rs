@@ -16,6 +16,7 @@ use crate::auth::{
     delete_user, edit_user, get_all_users, get_user, login, logout, register, validate_session,
 };
 use crate::categories::{create_category, delete_category, edit_category, get_categories};
+use crate::transactions::create_transaction;
 
 pub fn create_api_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
@@ -29,6 +30,8 @@ pub fn create_api_router(state: AppState) -> Router {
         .route("/", post(create_category))
         .route("/:id", put(edit_category).delete(delete_category));
 
+    let transactions = Router::new().route("/", post(create_transaction));
+
     let auth_router = Router::new()
         .route("/register", post(register))
         .route("/login", post(login))
@@ -38,6 +41,7 @@ pub fn create_api_router(state: AppState) -> Router {
 
     Router::new()
         // nest protected routes here
+        .nest("/transactions", transactions)
         .nest("/categories", categories)
         .route("/check", get(auth_check))
         .layer(middleware::from_fn_with_state(

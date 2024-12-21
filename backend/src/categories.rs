@@ -13,8 +13,9 @@ use crate::{auth::get_user_id, AppState};
 
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct CategoryInfo {
-    pub id: Uuid,
-    pub name: String,
+    pub category_id: Uuid,
+    pub category_name: String,
+    pub transaction_type: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -36,6 +37,7 @@ pub async fn get_categories(
     let query = sqlx::query_as::<_, CategoryInfo>(
         "
             SELECT
+                categories.id AS category_id,
                 categories.name AS category_name,
                 transaction_types.name AS transaction_type
             FROM
@@ -44,12 +46,14 @@ pub async fn get_categories(
                 transaction_types
             ON
                 categories.type_id = transaction_types.id
-            WHERE 
+            WHERE
                 user_id = $1
-            GROUP BY 
-                categories.name, transaction_types.name
-            ORDER BY 
+
+            GROUP BY
+                categories.name, categories.id, transaction_types.name
+            ORDER BY
                 transaction_types.name, categories.name;
+
         ",
     )
     .bind(user_id)
@@ -77,12 +81,11 @@ pub async fn create_category(
         return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
     };
 
-    let type_id: Option<String> =
-        sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
-            .bind(request.transaction_type.to_lowercase())
-            .fetch_optional(&state.postgres)
-            .await
-            .expect("Failed to find transaction type");
+    let type_id: i32 = sqlx::query_scalar("SELECT id FROM transaction_types WHERE name = $1")
+        .bind(request.transaction_type.to_lowercase())
+        .fetch_one(&state.postgres)
+        .await
+        .expect("Failed to find transaction type");
 
     let query = sqlx::query("INSERT INTO categories (user_id, name, type_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",).bind(user_id).bind(request.name).bind(type_id).execute(&state.postgres);
 
