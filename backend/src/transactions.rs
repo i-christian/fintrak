@@ -1,9 +1,12 @@
 use axum::{extract::State, response::IntoResponse, Json};
-use axum_extra::extract::PrivateCookieJar;
+use axum_extra::extract::{PrivateCookieJar, Query};
 use bigdecimal::BigDecimal;
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
+use sqlx::{
+    prelude::FromRow,
+    types::chrono::{self, NaiveDate},
+};
 use uuid::Uuid;
 
 use crate::{auth::get_user_id, AppState};
@@ -28,12 +31,18 @@ pub struct TransactionInfo {
     pub transaction_type: String,
 }
 
-// POST /transactions
-// Purpose: Create a new transaction.
-// Validations:
-// Ensure category_id and type_id exist and belong to the authenticated user.
-// Behavior:
-// Add the transaction to the database with the appropriate user_id, category_id, type_id, amount, transaction_date, and optional notes.
+#[derive(Deserialize)]
+pub struct Params {
+    #[serde(default)]
+    pub year: Option<i32>,
+    pub month: Option<u32>,
+}
+/// Handles creating a new transaction.
+///
+/// # POST /transactions
+///
+/// ## Purpose
+/// Create a new transaction for the authenticated user.
 pub async fn create_transaction(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -61,34 +70,12 @@ pub async fn create_transaction(
     }
 }
 
-// // GET /transactions
-// // Purpose: Retrieve transactions for the current month.
-// // Behavior:
-// // Return transactions for the authenticated user, grouped by category_id and type_id, and ordered by transaction_date (latest on top).
-// // Key Features:
-// // Transactions are automatically filtered to only include those from the current month.
-// // Results are grouped for easy categorization and analysis.
-/*
-SELECT
-    transactions.transaction_date,
-    transactions.amount,
-    transactions.notes,
-    transactions.currency,
-    categories.name AS category_name,
-    transaction_types.name AS transaction_type
-FROM
-    transactions
-JOIN
-    categories ON transactions.category_id = categories.id
-JOIN
-    transaction_types ON transactions.type_id = transaction_types.id
-WHERE
-    transactions.transaction_date >= DATE_TRUNC('month', CURRENT_DATE)
-    AND transactions.transaction_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
-    AND transactions.user_id = '6dbcc6d4-367d-444a-885a-bf9d136964bf'
-ORDER BY
-    transactions.transaction_date DESC;
-*/
+/// Handles default transactions retrieval.
+///
+/// # GET /transactions
+///
+/// ## Purpose
+/// returns a lists all transactions for the authenticated user.
 pub async fn get_transactions(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -136,36 +123,66 @@ pub async fn get_transactions(
     }
 }
 
-// // GET /transactions/{year}/{month}
-// // Purpose: Fetch transactions for a specific past month and year.
-// // Behavior:
-// // Retrieve transactions for the given year and month for the authenticated user.
-// // Results are grouped by category_id and type_id, and ordered by transaction_date (latest on top).
-// // Validations:
-// // Ensure valid year and month inputs.
-// // Edge Case Handling:
-// // Return an empty list if there are no transactions for the specified period.
-/*
-SELECT
-    transactions.transaction_date,
-    transactions.amount,
-    transactions.notes,
-    transactions.currency,
-    categories.name AS category_name,
-    transaction_types.name AS transaction_type
-FROM
-    transactions
-JOIN
-    categories ON transactions.category_id = categories.id
-JOIN
-    transaction_types ON transactions.type_id = transaction_types.id
-WHERE
-    transactions.transaction_date >= DATE_TRUNC('month', TIMESTAMP WITH TIME ZONE '{year}-{month}-01')
-    AND transactions.transaction_date < DATE_TRUNC('month', TIMESTAMP WITH TIME ZONE '{year}-{month}-01') + INTERVAL '1 month'
-    AND transactions.user_id = <authenticated_user_id>  -- Replace <authenticated_user_id> with the actual user ID
-ORDER BY
-    transactions.transaction_date DESC;
-*/
+/// Handles specified transactions retrieval.
+///
+/// # GET /transactions/{year}/{month}
+///
+/// Purpose: Fetch transactions for a specific past month and year.
+
+pub async fn get_transactions_by_date(
+    State(state): State<AppState>,
+    jar: PrivateCookieJar,
+    Query(params): Query<Params>,
+) -> impl IntoResponse {
+    let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
+        return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
+    };
+
+    let year = params.year.unwrap_or_default();
+    let month = params.month.unwrap_or_default();
+
+    let full_date = NaiveDate::from_ymd_opt(year, month, 1)
+        .unwrap_or_else(|| chrono::Local::now().date_naive());
+
+    let query = sqlx::query_as::<_, TransactionInfo>(
+        "
+        SELECT
+            transactions.transaction_date,
+            transactions.amount,
+            transactions.notes,
+            transactions.currency,
+            categories.name AS category_name,
+            transaction_types.name AS transaction_type
+        FROM
+            transactions
+        JOIN
+            categories ON transactions.category_id = categories.id
+        JOIN
+            transaction_types ON transactions.type_id = transaction_types.id
+        WHERE
+            transactions.transaction_date >= DATE_TRUNC('month', $1)
+        AND
+            transactions.transaction_date < DATE_TRUNC('month', $1) + INTERVAL '1 month'
+        AND
+            transactions.user_id = $2
+        ORDER BY
+            transactions.transaction_date DESC;
+        ",
+    )
+    .bind(full_date)
+    .bind(user_id)
+    .fetch_all(&state.postgres)
+    .await;
+
+    match query {
+        Ok(categories) => Json(categories).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to retrieve transactions: {}", e),
+        )
+            .into_response(),
+    }
+}
 
 // // GET /transactions/totals
 // // Purpose: Retrieve total transaction amounts for each category for the authenticated user.
