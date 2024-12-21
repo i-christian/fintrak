@@ -1,4 +1,4 @@
-use crate::AppState;
+use crate::{transactions::get_transactions, AppState};
 use axum::{
     http, middleware,
     routing::{get, post, put},
@@ -30,7 +30,7 @@ pub fn create_api_router(state: AppState) -> Router {
         .route("/", post(create_category))
         .route("/:id", put(edit_category).delete(delete_category));
 
-    let transactions = Router::new().route("/", post(create_transaction));
+    let transactions = Router::new().route("/", get(get_transactions).post(create_transaction));
 
     let auth_router = Router::new()
         .route("/register", post(register))
