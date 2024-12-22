@@ -14,7 +14,7 @@ const Login: Component = () => {
     try {
       const response = await fetch(`//${window.location.host}/api/check`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -29,7 +29,6 @@ const Login: Component = () => {
   if (localStorage.getItem("isLoggedIn") === "true") {
     checkAuthStatus();
   }
-
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -110,10 +109,7 @@ const Login: Component = () => {
           </div>
 
           <div class="flex w-full">
-            <button
-              type="submit"
-              class="btn"
-            >
+            <button type="submit" class="btn">
               <span class="mr-2 uppercase">Log In &rarr;</span>
             </button>
           </div>
@@ -123,7 +119,9 @@ const Login: Component = () => {
       <div class="flex justify-center items-center mt-6">
         <span class="inline-flex items-center text-gray-700 font-medium text-xs text-center">
           Don't have an account?
-          <a href="/register" class="text-xs ml-2 text-black font-semibold">Register here</a>
+          <a href="/register" class="text-xs ml-2 text-black font-semibold">
+            Register here
+          </a>
         </span>
       </div>
     </form>
