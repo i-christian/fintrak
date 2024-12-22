@@ -84,7 +84,19 @@ pub async fn create_transaction(
     let query = sqlx::query("INSERT INTO transactions (user_id, category_id, type_id, amount, notes) VALUES ($1, $2, $3, $4, $5)").bind(user_id).bind(result.0).bind(result.1).bind(request.amount).bind(request.notes).execute(&state.postgres);
 
     match query.await {
-        Ok(_) => (StatusCode::OK, "Transaction created successfully").into_response(),
+        Ok(_) => {
+            if let Err(e) = sqlx::query("REFRESH MATERIALIZED VIEW last_6_months_transactions")
+                .execute(&state.postgres)
+                .await
+            {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Transaction added, but failed to refresh view: {}", e),
+                )
+                    .into_response();
+            }
+            (StatusCode::OK, "Transaction created successfully").into_response()
+        }
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             format!("Failed to add transaction: {}", e),
@@ -209,7 +221,7 @@ pub async fn get_transactions_by_date(
     }
 }
 
-/// Handles default transactions retrieval.
+/// Handles transactions totals retrieval.
 ///
 /// # GET /transactions/totals
 ///
@@ -302,7 +314,17 @@ pub async fn edit_transaction(
 
     match query.await {
         Ok(result) if result.rows_affected() > 0 => {
-            (StatusCode::OK, "Transaction update successfully").into_response()
+            if let Err(e) = sqlx::query("REFRESH MATERIALIZED VIEW last_6_months_transactions")
+                .execute(&state.postgres)
+                .await
+            {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Transaction updated, but failed to refresh view: {}", e),
+                )
+                    .into_response();
+            }
+            (StatusCode::OK, "Transaction updated successfully").into_response()
         }
         Ok(_) => (StatusCode::NOT_FOUND, "Transaction not found!").into_response(),
         Err(_) => (
@@ -328,9 +350,19 @@ pub async fn delete_transaction(
 
     match query.await {
         Ok(result) if result.rows_affected() > 0 => {
+            if let Err(e) = sqlx::query("REFRESH MATERIALIZED VIEW last_6_months_transactions")
+                .execute(&state.postgres)
+                .await
+            {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Transaction deleted, but failed to refresh view: {}", e),
+                )
+                    .into_response();
+            }
             (StatusCode::OK, "Transaction deleted successfully").into_response()
         }
-        Ok(_) => (StatusCode::NOT_FOUND, "Transaction not founf!").into_response(),
+        Ok(_) => (StatusCode::NOT_FOUND, "Transaction not found!").into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Failed to delete transaction",
