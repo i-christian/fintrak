@@ -11,7 +11,7 @@
 
 ## Description
 
-FinTrak is a finance tracking app designed to help users manage their personal and group finances effectively. The app offers essential budgeting tools, transaction tracking, and collaboration features.
+FinTrak is a finance tracking app designed to help users manage their personal finances effectively. The app offers category managements, and streamlined transaction tracking features.
 
 Built with a modern tech stack, FinTrak utilizes Rust for its high-performance backend, SolidJS for a reactive and intuitive frontend, and PostgreSQL for secure and efficient data management. Containerized with Docker, it ensures seamless development and deployment.
 
@@ -20,14 +20,19 @@ Built with a modern tech stack, FinTrak utilizes Rust for its high-performance b
 - [x] **Personal Management**: Create and track expenses & income throughout the month.
 - [x] **Category Management**: Define custom income and expense categories for users.
 - [x] **Transaction Tracking**: Log and manage transactions for individuals, categorized as expense or income.
-- [x] **Cross-Platform Accessibility**: A responsive, dynamic UI that works seamlessly across all devices.
-- [ ] **Budget Management**: Set and monitor budgets for specific categories per user.
-- [ ] **Financial Reports**: Generate summaries of income, expenses, and budget performance for specific time periods.
+- [x] **Cross-Platform Accessibility:** A responsive, dynamic UI that works seamlessly across all devices.
+- [x] **Generate graphical insights:** Show the trends of income and expenses for the last 6 months on a graph.
+- [x] **Financial Reports:** Generate summaries of income, and expenses, for specific time periods.
+
+### Possible Future Features
+- [ ] **Export reports to Pdf or spreadsheets:** Allow users to download their finance reports.
+- [ ] **Budgeting:** Creating budgets to specify monthly target expenses for each category and tracking them against transactions.
+- [ ] **Notifications:** Implement a notification system that sends users various kinds of alerts.
 
 ## Prerequisites 📋
 - [Rust](https://www.rust-lang.org/)
 - [Axum](https://docs.rs/axum/latest/axum/)
-- [Node.js & npm](https://nodejs.org/)
+- [Node v22 & npm](https://nodejs.org/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [SolidJS](https://docs.solidjs.com/)
 - [Docker](https://www.docker.com/)
