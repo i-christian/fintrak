@@ -40,6 +40,12 @@ pub struct UserInfo {
     pub email: String,
 }
 
+/// Handles user registration.
+///
+/// # POST /auth/register
+///
+/// ## Purpose:
+/// - Creates a new user.
 pub async fn register(
     State(state): State<AppState>,
     Json(newuser): Json<RegisterDetails>,
@@ -62,6 +68,12 @@ pub async fn register(
     }
 }
 
+/// Handles registered user login.
+///
+/// # POST /auth/login
+///
+/// ## Purpose:
+/// - allows registered user to login and handles session management
 pub async fn login(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -103,6 +115,12 @@ pub async fn login(
     }
 }
 
+/// Handles getting a single user information.
+///
+/// # GET /auth/user
+///
+/// ## Purpose:
+/// - gets a user information
 pub async fn get_user(State(state): State<AppState>, jar: PrivateCookieJar) -> impl IntoResponse {
     let Some(user_id) = get_user_id(jar, State(state.clone())).await else {
         return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
@@ -123,6 +141,12 @@ pub async fn get_user(State(state): State<AppState>, jar: PrivateCookieJar) -> i
     }
 }
 
+/// Handles retrieval of all users.
+///
+/// # GET /auth/get_all_users
+///
+/// ## Purpose:
+/// - retrieves all users returning their id, name, and emails
 pub async fn get_all_users(State(state): State<AppState>) -> impl IntoResponse {
     let query = sqlx::query_as::<_, UserInfo>("SELECT id, name, email FROM users")
         .fetch_all(&state.postgres)
@@ -138,6 +162,10 @@ pub async fn get_all_users(State(state): State<AppState>) -> impl IntoResponse {
     }
 }
 
+/// A helper function used to retrieve a user's id given thier session.
+///
+/// ## Purpose:
+/// - Used throughout the application to retrieve a user_id which is then used as a foreign key in most tables.
 pub async fn get_user_id(jar: PrivateCookieJar, State(state): State<AppState>) -> Option<Uuid> {
     if let Some(cookie) = jar.get("sessionid") {
         if let Ok(session_id) = Uuid::parse_str(cookie.value()) {
@@ -161,6 +189,12 @@ pub async fn get_user_id(jar: PrivateCookieJar, State(state): State<AppState>) -
     }
 }
 
+/// Handles logout.
+///
+/// # GET /auth/user
+///
+/// ## Purpose:
+/// - clears out user session
 pub async fn logout(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -179,6 +213,10 @@ pub async fn logout(
     }
 }
 
+/// A Middleware which handles session validations.
+///
+/// ## Purpose:
+/// - validates all requests sent to the application. And either approves or rejects requests
 pub async fn validate_session(
     jar: PrivateCookieJar,
     State(state): State<AppState>,
@@ -208,6 +246,12 @@ pub async fn validate_session(
     }
 }
 
+/// Handles user information updates.
+///
+/// # PUT /auth/user
+///
+/// ## Purpose:
+/// - Allow users to their information
 pub async fn edit_user(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -245,6 +289,12 @@ pub async fn edit_user(
     }
 }
 
+/// Handles user deletion.
+///
+/// # DELETE /auth/user
+///
+/// ## Purpose:
+/// - allow users to delete thier accounts permanently
 pub async fn delete_user(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
