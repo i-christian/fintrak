@@ -151,8 +151,8 @@ pub async fn get_transactions(
 ///
 /// # GET /transactions/{year}/{month}
 ///
-/// Purpose: Fetch transactions for a specific past month and year.
-
+/// ## Purpose:
+/// - Fetch transactions for a specific past month and year.
 pub async fn get_transactions_by_date(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -213,8 +213,8 @@ pub async fn get_transactions_by_date(
 ///
 /// # GET /transactions/totals
 ///
-/// ## Purpose
-/// Retrieve total transaction amounts for each category for the authenticated user
+/// ## Purpose:
+///  - Retrieve total transaction amounts for each category for the authenticated user
 pub async fn get_transactions_totals(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -262,8 +262,10 @@ pub async fn get_transactions_totals(
 }
 
 /// # PUT /transactions/{id}
-/// ## Purpose: Update an existing transaction.
-/// ## Behavior: Update the transaction record with the new values.
+/// ## Purpose:
+///  - Update an existing transaction.
+/// ## Behavior:
+///  - Update the transaction record with the new values.
 pub async fn edit_transaction(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -312,9 +314,10 @@ pub async fn edit_transaction(
 }
 
 /// # DELETE /transactions/{id}
-/// ## Purpose: Delete a specific transaction.
+/// ## Purpose:
+/// - Delete a specific transaction.
 ///## Behavior:
-/// Remove the transaction from the database.
+/// - Remove the transaction from the database.
 pub async fn delete_transaction(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
