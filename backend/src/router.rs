@@ -21,6 +21,12 @@ use crate::transactions::{
     get_transactions_by_date, get_transactions_totals,
 };
 
+/// Management of routing and authorisation for the whole application
+///
+/// ## Purpose:
+/// - handles for CORS management
+/// - handles allowed methods and headers for requests
+/// - manages all routing for the application
 pub fn create_api_router(state: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_credentials(true)
@@ -61,10 +67,19 @@ pub fn create_api_router(state: AppState) -> Router {
         .layer(cors)
 }
 
+/// Handles checking user authentication.
+///
+/// # GET /check
+///
+/// ## Purpose
+/// - Checks if the user has a valid session or not.
 pub async fn auth_check() -> StatusCode {
     StatusCode::OK
 }
 
+/// Checks if the API is online
+///
+/// # GET /health
 pub async fn hello_world() -> &'static str {
     "Hello world!"
 }
