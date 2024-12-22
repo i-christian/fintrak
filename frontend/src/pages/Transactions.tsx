@@ -9,8 +9,10 @@ const Transactions: Component = () => {
         <button class="btn">New</button>
         <button class="btn">Filter</button>
       </div>
-      <p>Monthly transactions, with edit and delete options</p>
-      <section class="my-5">
+      <p class="mt-5 py-2 border-t-2 border-black text-center text-xl">
+        Recent transactions
+      </p>
+      <section>
         <ul>
           <li>transactions date, amount, type and notes/desc</li>
         </ul>
