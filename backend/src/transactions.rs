@@ -54,7 +54,6 @@ pub struct Params {
 
 #[derive(Serialize, Deserialize, FromRow)]
 pub struct TransactionTotals {
-    pub category_name: String,
     pub transaction_type: String,
     #[serde(with = "bigdecimal::serde::json_num")]
     pub total_amount: BigDecimal,
@@ -238,13 +237,10 @@ pub async fn get_transactions_totals(
     let query = sqlx::query_as::<_, TransactionTotals>(
         "
         SELECT
-            categories.name AS category_name,
             transaction_types.name AS transaction_type,
             SUM(transactions.amount) AS total_amount
         FROM
             transactions
-        JOIN
-            categories ON transactions.category_id = categories.id
         JOIN
             transaction_types ON transactions.type_id = transaction_types.id
         WHERE
@@ -254,7 +250,7 @@ pub async fn get_transactions_totals(
         AND
             transactions.user_id = $1
         GROUP BY
-            categories.name, transaction_types.name
+            transaction_types.name
         ORDER BY
             SUM(transactions.amount) DESC;
         ",
