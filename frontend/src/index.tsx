@@ -6,17 +6,19 @@ import {
   createSignal,
   lazy,
   onMount,
+  ParentComponent,
 } from "solid-js";
 import { getUser } from "./hooks/useFetch";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-const Home = lazy(() => import("./pages/Home"));
-const WrongPage = lazy(() => import("./pages/404"));
-const Dashboard = lazy(() => import("./components/Dashboard"));
-const Settings = lazy(() => import("./pages/Settings"));
-const Categories = lazy(() => import("./pages/Categories"));
+const Home: ParentComponent = lazy(() => import("./pages/Home"));
+const WrongPage: Component = lazy(() => import("./pages/404"));
+const Dashboard: Component = lazy(() => import("./components/Dashboard"));
+const Settings: Component = lazy(() => import("./pages/Settings"));
+const Categories: Component = lazy(() => import("./pages/Categories"));
+const Transactions: Component = lazy(() => import("./pages/Transactions"));
 
 //should be set to false
 export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
@@ -56,6 +58,9 @@ const App: Component = () => {
       </Route>
       <Route path="/categories" component={Home}>
         <Route path="/" component={Categories} />
+      </Route>
+      <Route path="/transactions" component={Home}>
+        <Route path="/" component={Transactions} />
       </Route>
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
