@@ -24,8 +24,10 @@ pub struct CategoryRequest {
     pub transaction_type: String,
 }
 
-// GET /categories
-// list all categories for the authenticated user
+/// Handles retrieval categories
+/// # GET /categories
+/// # Purpose:
+/// - list all categories for the authenticated user
 pub async fn get_categories(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -70,8 +72,10 @@ pub async fn get_categories(
     }
 }
 
-// POST /categories
-//creates a new category
+/// Handles creating categories
+/// # POST /categories
+/// # Purpose:
+/// - creates a category
 pub async fn create_category(
     State(state): State<AppState>,
     jar: PrivateCookieJar,
@@ -99,9 +103,10 @@ pub async fn create_category(
     }
 }
 
-// # PUT /categories/{id}
-// we can change the category name, and type_id (transaction type)
-//return success or failure status
+/// Handles updating categories
+/// # PUT /categories/{:id}
+/// # Purpose:
+/// - allows an authenticated user to edit thier category
 pub async fn edit_category(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -128,9 +133,10 @@ pub async fn edit_category(
     }
 }
 
-// DELETE /categories/{id}
-// we can delete the category for the user
-// return success or failure status
+/// Handles deleting categories
+/// # DELETE /categories/{:id}
+/// # Purpose:
+/// - allows an authenticated user to delete thier category
 pub async fn delete_category(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
