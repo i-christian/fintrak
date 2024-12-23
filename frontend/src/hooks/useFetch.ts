@@ -191,3 +191,15 @@ export const getTransactionsByDate = async (year: string, month: string) => {
 
   return response.json();
 };
+
+export const getInsights = async () => {
+  const response = await fetch(`//${window.location.host}/api/insights`, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
+  });
+
+  if (!response.ok) throw new Error("failed to load user information");
+
+  return response.json();
+};
