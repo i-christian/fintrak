@@ -36,8 +36,7 @@ export const createCategory = async (name: string, type: string) => {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to update category");
+    throw new Error("Failed to update category");
   }
 
   return "Category created successfully";
@@ -64,8 +63,7 @@ export const updateCategory = async (
   );
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to create category");
+    throw new Error("Failed to create category");
   }
 
   return "Category updated successfully";
@@ -84,8 +82,7 @@ export const deleteCategory = async (id: String) => {
   );
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to update category");
+    throw new Error("Failed to update category");
   }
 
   return "Category updated successfully";
@@ -110,11 +107,8 @@ export const createTransaction = async (
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to create transaction");
+    throw new Error("Failed to create transaction");
   }
-
-  return "Transaction created successfully";
 };
 
 export const editTransaction = async (
@@ -142,8 +136,7 @@ export const editTransaction = async (
   );
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to update transaction");
+    throw new Error("Failed to update transaction");
   }
 
   return "Transaction updated successfully";
@@ -162,8 +155,7 @@ export const deleteTransaction = async (id: string) => {
   );
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to delete transaction");
+    throw new Error("Failed to delete transaction");
   }
 
   return "Transaction deleted successfully";
@@ -216,7 +208,6 @@ export const getTransactionsByDate = async (year: string, month: string) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching transactions:", error);
     throw error;
   }
 };

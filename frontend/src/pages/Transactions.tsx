@@ -9,6 +9,7 @@ import {
 } from "solid-js";
 import { getTotals, getTransactions } from "../hooks/useFetch";
 import Summary from "../components/Summary";
+import TransactionModal from "../components/TransactionModal";
 
 interface Transaction {
   trans_id: string;
@@ -23,15 +24,21 @@ interface Transaction {
 const Transactions: Component = () => {
   const [total, { refetch }] = createResource(getTotals);
   const [expanded, setExpanded] = createSignal(false);
-  const toggleNotes = () => setExpanded(!expanded());
   const [transactions, setTransactions] = createSignal<Transaction[]>([]);
+  const [open, setOpen] = createSignal(false);
+
+  const toggleNotes = () => setExpanded(!expanded());
 
   const recentTransactions = async () => {
     const data: Transaction[] = await getTransactions();
     setTransactions(data);
   };
 
-  recentTransactions();
+  const handleModalSuccess = async () => {
+    await recentTransactions();
+    refetch();
+    setOpen(false);
+  };
 
   const formatCurrency = (currency: string, amount: number) => {
     const formatter = new Intl.NumberFormat("en-US", {
@@ -40,6 +47,8 @@ const Transactions: Component = () => {
     });
     return formatter.format(amount);
   };
+
+  recentTransactions();
 
   return (
     <main>
@@ -55,11 +64,20 @@ const Transactions: Component = () => {
       </Suspense>
 
       <div class="flex gap-2 flex-wrap sm:flex-nowrap sm:gap-5">
-        <button class="btn" onClick={() => refetch()}>
+        <button class="btn" onClick={() => setOpen(true)}>
           New
         </button>
         <button class="btn">Filter</button>
       </div>
+
+      {open() && (
+        <TransactionModal
+          open={open}
+          setOpen={setOpen}
+          onSuccess={handleModalSuccess}
+        />
+      )}
+
       <p class="mt-5 py-2 border-t-2 border-black text-center text-xl">
         Recent transactions
       </p>
@@ -91,7 +109,11 @@ const Transactions: Component = () => {
             <For each={transactions()}>
               {(transaction) => (
                 <tr
-                  class={`hover:bg-gray-50 ${transaction.transaction_type === "expense" ? "bg-red-200" : "bg-blue-200"}`}
+                  class={`hover:bg-gray-50 ${
+                    transaction.transaction_type === "expense"
+                      ? "bg-red-200"
+                      : "bg-blue-200"
+                  }`}
                 >
                   <td class="px-4 py-2 text-sm text-gray-600">
                     {new Date(transaction.transaction_date).toLocaleString()}
@@ -107,7 +129,9 @@ const Transactions: Component = () => {
                   </td>
                   <td class="px-4 py-2 text-sm text-gray-600">
                     <p
-                      class={`${expanded() ? "line-clamp-none" : "line-clamp-2"} text-sm`}
+                      class={`${
+                        expanded() ? "line-clamp-none" : "line-clamp-2"
+                      } text-sm`}
                     >
                       {transaction.notes}
                     </p>

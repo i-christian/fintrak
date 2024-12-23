@@ -82,7 +82,7 @@ const SideBar: Component<{
         <A href="/transactions" class="link">
           Transactions{" "}
         </A>
-  
+
         <A href="/settings" class="link">
           Settings{" "}
         </A>
