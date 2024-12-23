@@ -189,25 +189,17 @@ export const getTransactions = async () => {
 };
 
 export const getTransactionsByDate = async (year: string, month: string) => {
-  const params = new URLSearchParams({
-    year: year,
-    month: month,
+  const url = `//${window.location.host}/api/transactions/by_date?year=${year}&month=${month}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
   });
-  const url = new URL(`//${window.location.host}/api/transactions/${params}`);
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      credentials: "include",
-      mode: "cors",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to load transactions: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Failed to load transactions: ${response.statusText}`);
   }
+
+  return response.json();
 };

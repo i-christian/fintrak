@@ -10,8 +10,9 @@ import {
 import { getTotals, getTransactions } from "../hooks/useFetch";
 import Summary from "../components/Summary";
 import TransactionModal from "../components/TransactionModal";
+import FilterModal from "../components/FilterModal";
 
-interface Transaction {
+export interface Transaction {
   trans_id: string;
   transaction_date: string;
   amount: number;
@@ -26,6 +27,9 @@ const Transactions: Component = () => {
   const [expanded, setExpanded] = createSignal(false);
   const [transactions, setTransactions] = createSignal<Transaction[]>([]);
   const [open, setOpen] = createSignal(false);
+  const [filterOpen, setFilterOpen] = createSignal(false);
+  const [typeOfData, setTypeOfData] = createSignal("Recent transactions");
+  const [filteredData, setFilteredData] = createSignal<Transaction[]>([]);
 
   const toggleNotes = () => setExpanded(!expanded());
 
@@ -67,7 +71,9 @@ const Transactions: Component = () => {
         <button class="btn" onClick={() => setOpen(true)}>
           New
         </button>
-        <button class="btn">Filter</button>
+        <button class="btn" onClick={() => setFilterOpen(true)}>
+          Filter
+        </button>
       </div>
 
       {open() && (
@@ -78,8 +84,16 @@ const Transactions: Component = () => {
         />
       )}
 
+      {filterOpen() && (
+        <FilterModal
+          filterOpen={filterOpen}
+          setFilterOpen={setFilterOpen}
+          setFilteredData={setFilteredData}
+        />
+      )}
+
       <p class="mt-5 py-2 border-t-2 border-black text-center text-xl">
-        Recent transactions
+        {typeOfData()}
       </p>
       <section class="overflow-x-auto p-4">
         <table class="min-w-full table-auto border-collapse">
