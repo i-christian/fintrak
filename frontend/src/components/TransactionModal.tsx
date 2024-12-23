@@ -1,5 +1,12 @@
-import { Accessor, Component, createSignal, Setter } from "solid-js";
-import { createTransaction } from "../hooks/useFetch";
+import {
+  Accessor,
+  Component,
+  createSignal,
+  Setter,
+  For,
+  onMount,
+} from "solid-js";
+import { createTransaction, getCategories } from "../hooks/useFetch";
 
 interface TransactionModalProps {
   open: Accessor<boolean>;
@@ -7,19 +14,39 @@ interface TransactionModalProps {
   onSuccess: () => void;
 }
 
+interface Category {
+  category_id: string;
+  category_name: string;
+  transaction_type: "income" | "expense";
+}
+
 const TransactionModal: Component<TransactionModalProps> = (props) => {
-  const [category, setCategory] = createSignal("");
+  const [selectedCategory, setSelectedCategory] = createSignal("");
+  const [categories, setCategories] = createSignal<Category[]>([]);
   const [amount, setAmount] = createSignal(0);
   const [notes, setNotes] = createSignal("");
   const [error, setError] = createSignal("");
 
+  const listCategories = async () => {
+    setError("");
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      setError("categories not found");
+    }
+  };
+  onMount(() => listCategories());
+
   const handleCreateTransaction = async () => {
     setError("");
     try {
-      await createTransaction(category(), amount(), notes());
+      if (!selectedCategory()) throw new Error("Please select a category.");
+      if (amount() <= 0) throw new Error("Amount must be greater than zero.");
+      await createTransaction(selectedCategory(), amount(), notes());
       props.onSuccess();
     } catch (error) {
-      setError(`An unexpected error occurred.`);
+      setError(`An unexpected error occurred`);
     }
   };
 
@@ -38,26 +65,51 @@ const TransactionModal: Component<TransactionModalProps> = (props) => {
             handleCreateTransaction();
           }}
         >
-          <input
-            type="text"
-            placeholder="Category"
-            value={category()}
-            onInput={(e) => setCategory(e.currentTarget.value)}
-            class="w-full mb-2 p-2 border rounded"
-          />
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount()}
-            onInput={(e) => setAmount(Number(e.currentTarget.value))}
-            class="w-full mb-2 p-2 border rounded"
-          />
-          <textarea
-            placeholder="Description"
-            value={notes()}
-            onInput={(e) => setNotes(e.currentTarget.value)}
-            class="w-full mb-4 p-2 border rounded"
-          />
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2" for="category">
+              Category
+            </label>
+            <select
+              id="category"
+              value={selectedCategory()}
+              onInput={(e) => setSelectedCategory(e.currentTarget.value)}
+              class="w-full p-2 border rounded"
+            >
+              <option value="">Select a category</option>
+              <For each={categories()}>
+                {(cat: Category) => (
+                  <option value={cat.category_name}>
+                    {cat.category_name} ({cat.transaction_type})
+                  </option>
+                )}
+              </For>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2" for="amount">
+              Amount
+            </label>
+            <input
+              id="amount"
+              type="number"
+              placeholder="Amount"
+              value={amount()}
+              onInput={(e) => setAmount(Number(e.currentTarget.value))}
+              class="w-full p-2 border rounded"
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2" for="notes">
+              Notes
+            </label>
+            <textarea
+              id="notes"
+              placeholder="Notes"
+              value={notes()}
+              onInput={(e) => setNotes(e.currentTarget.value)}
+              class="w-full p-2 border rounded"
+            />
+          </div>
           <div class="flex justify-end gap-2">
             <button
               type="button"
