@@ -75,17 +75,12 @@ export const deleteCategory = async (id: String) => {
     {
       method: "DELETE",
       mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
   );
 
   if (!response.ok) {
     throw new Error("Failed to update category");
   }
-
-  return "Category updated successfully";
 };
 
 export const createTransaction = async (
@@ -113,9 +108,9 @@ export const createTransaction = async (
 
 export const editTransaction = async (
   id: string,
-  category: string | null,
-  type: string | null,
-  amount: number | null,
+  category: string,
+  type: string,
+  amount: number,
   notes: string | null,
 ) => {
   const response = await fetch(
@@ -138,8 +133,6 @@ export const editTransaction = async (
   if (!response.ok) {
     throw new Error("Failed to update transaction");
   }
-
-  return "Transaction updated successfully";
 };
 
 export const deleteTransaction = async (id: string) => {
@@ -148,17 +141,12 @@ export const deleteTransaction = async (id: string) => {
     {
       method: "DELETE",
       mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
   );
 
   if (!response.ok) {
     throw new Error("Failed to delete transaction");
   }
-
-  return "Transaction deleted successfully";
 };
 
 export const getTotals = async () => {

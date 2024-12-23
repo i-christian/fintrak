@@ -12,6 +12,8 @@ import { getTotals, getTransactions } from "../hooks/useFetch";
 import Summary from "../components/Summary";
 import TransactionModal from "../components/TransactionModal";
 import FilterModal from "../components/FilterModal";
+import EditModal from "../components/EditModal";
+import DeleteModal from "../components/deleteModal";
 
 export interface Transaction {
   trans_id: string;
@@ -31,8 +33,11 @@ const Transactions: Component = () => {
   const [typeOfData, setTypeOfData] = createSignal("Recent transactions");
   const [filteredData, setFilteredData] = createSignal<Transaction[]>([]);
   const [filterActive, setFilterActive] = createSignal(false);
-
   const toggleNotes = () => setExpanded(!expanded());
+  const [editOpen, setEditOpen] = createSignal(false);
+  const [deleteOpen, setDeleteOpen] = createSignal(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    createSignal<Transaction | null>(null);
 
   const recentTransactions = async () => {
     const data: Transaction[] = await getTransactions();
@@ -61,6 +66,18 @@ const Transactions: Component = () => {
     await recentTransactions();
     refetch();
     setOpen(false);
+  };
+
+  const handleDeleteModalSuccess = async () => {
+    await recentTransactions();
+    refetch();
+    setDeleteOpen(false);
+  };
+
+  const handleEditModalSuccess = async () => {
+    await recentTransactions();
+    refetch();
+    setEditOpen(false);
   };
 
   const formatCurrency = (currency: string, amount: number) => {
@@ -110,6 +127,24 @@ const Transactions: Component = () => {
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
           handleFilterSuccess={handleFilterSuccess}
+        />
+      )}
+
+      {editOpen() && selectedTransaction() && (
+        <EditModal
+          open={editOpen}
+          setOpen={setEditOpen}
+          transaction={selectedTransaction}
+          onSuccess={handleEditModalSuccess}
+        />
+      )}
+
+      {deleteOpen() && selectedTransaction() && (
+        <DeleteModal
+          open={deleteOpen}
+          setOpen={setDeleteOpen}
+          transaction={selectedTransaction}
+          onSuccess={handleDeleteModalSuccess}
         />
       )}
 
@@ -178,10 +213,22 @@ const Transactions: Component = () => {
                     </button>
                   </td>
                   <td class="px-4 py-2 text-sm flex gap-1">
-                    <button class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-xs">
+                    <button
+                      class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-xs"
+                      onClick={() => {
+                        setSelectedTransaction(transaction);
+                        setEditOpen(true);
+                      }}
+                    >
                       Edit
                     </button>
-                    <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-xs">
+                    <button
+                      class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-xs"
+                      onClick={() => {
+                        setSelectedTransaction(transaction);
+                        setDeleteOpen(true);
+                      }}
+                    >
                       Delete
                     </button>
                   </td>
