@@ -48,8 +48,8 @@ pub struct TransactionInfo {
 #[derive(Deserialize)]
 pub struct Params {
     #[serde(default)]
-    pub year: Option<i32>,
-    pub month: Option<u32>,
+    pub year: Option<String>,
+    pub month: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, FromRow)]
@@ -173,8 +173,16 @@ pub async fn get_transactions_by_date(
         return (StatusCode::FORBIDDEN, "Unauthorized").into_response();
     };
 
-    let year = params.year.unwrap_or_default();
-    let month = params.month.unwrap_or_default();
+    let year = params
+        .year
+        .unwrap_or_default()
+        .parse::<i32>()
+        .unwrap_or_default();
+    let month = params
+        .month
+        .unwrap_or_default()
+        .parse::<u32>()
+        .unwrap_or_default();
 
     let full_date = NaiveDate::from_ymd_opt(year, month, 1)
         .unwrap_or_else(|| chrono::Local::now().date_naive());
