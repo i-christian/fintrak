@@ -5,7 +5,7 @@ import { Transaction } from "../pages/Transactions";
 interface FilterModalProps {
   filterOpen: Accessor<boolean>;
   setFilterOpen: Setter<boolean>;
-  setFilteredData: Setter<Transaction[]>;
+  handleFilterSuccess: (filteredData: Transaction[]) => void;
 }
 
 const FilterModal: Component<FilterModalProps> = (props) => {
@@ -19,7 +19,7 @@ const FilterModal: Component<FilterModalProps> = (props) => {
       if (!year()) throw new Error("Please select a year");
       if (!month()) throw new Error("Please select a month");
       const data = await getTransactionsByDate(year(), month());
-      props.setFilteredData(data);
+      props.handleFilterSuccess(data);
       props.setFilterOpen(false);
     } catch (err) {
       setError(`No data found: ${error}`);

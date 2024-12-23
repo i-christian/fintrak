@@ -6,6 +6,7 @@ import {
   Match,
   For,
   createResource,
+  createEffect,
 } from "solid-js";
 import { getTotals, getTransactions } from "../hooks/useFetch";
 import Summary from "../components/Summary";
@@ -21,7 +22,6 @@ export interface Transaction {
   category_name: string;
   transaction_type: "income" | "expense";
 }
-
 const Transactions: Component = () => {
   const [total, { refetch }] = createResource(getTotals);
   const [expanded, setExpanded] = createSignal(false);
@@ -30,12 +30,31 @@ const Transactions: Component = () => {
   const [filterOpen, setFilterOpen] = createSignal(false);
   const [typeOfData, setTypeOfData] = createSignal("Recent transactions");
   const [filteredData, setFilteredData] = createSignal<Transaction[]>([]);
+  const [filterActive, setFilterActive] = createSignal(false);
 
   const toggleNotes = () => setExpanded(!expanded());
 
   const recentTransactions = async () => {
     const data: Transaction[] = await getTransactions();
     setTransactions(data);
+    setTypeOfData("Recent transactions");
+    setFilterActive(false);
+  };
+
+  const handleFilterToggle = () => {
+    if (filterActive()) {
+      setTypeOfData("Recent transactions");
+      setFilterActive(false);
+    } else {
+      setFilterOpen(true);
+    }
+  };
+
+  const handleFilterSuccess = (filteredData: Transaction[]) => {
+    setFilteredData(filteredData);
+    setTypeOfData("Filtered transactions");
+    setFilterActive(true);
+    setFilterOpen(false);
   };
 
   const handleModalSuccess = async () => {
@@ -52,7 +71,9 @@ const Transactions: Component = () => {
     return formatter.format(amount);
   };
 
-  recentTransactions();
+  createEffect(() => {
+    recentTransactions();
+  });
 
   return (
     <main>
@@ -71,8 +92,8 @@ const Transactions: Component = () => {
         <button class="btn" onClick={() => setOpen(true)}>
           New
         </button>
-        <button class="btn" onClick={() => setFilterOpen(true)}>
-          Filter
+        <button class="btn" onClick={handleFilterToggle}>
+          {filterActive() ? "Recent" : "Filter"}
         </button>
       </div>
 
@@ -88,7 +109,7 @@ const Transactions: Component = () => {
         <FilterModal
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
-          setFilteredData={setFilteredData}
+          handleFilterSuccess={handleFilterSuccess}
         />
       )}
 
@@ -120,7 +141,7 @@ const Transactions: Component = () => {
             </tr>
           </thead>
           <tbody>
-            <For each={transactions()}>
+            <For each={filterActive() ? filteredData() : transactions()}>
               {(transaction) => (
                 <tr
                   class={`hover:bg-gray-50 ${
