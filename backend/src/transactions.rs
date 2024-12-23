@@ -29,7 +29,7 @@ pub struct UpdateRequest {
     pub transaction_type: String,
     #[serde(with = "bigdecimal::serde::json_num")]
     pub amount: BigDecimal,
-    pub notes: String,
+    pub notes: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, FromRow)]
@@ -293,7 +293,7 @@ pub async fn edit_transaction(
         .await
         .expect("Failed to find transaction type");
 
-    let category_id: i32 = sqlx::query_scalar("SELECT id FROM categories WHERE name = $1")
+    let category_id: Uuid = sqlx::query_scalar("SELECT id FROM categories WHERE name = $1")
         .bind(update.category_name)
         .fetch_one(&state.postgres)
         .await
@@ -306,13 +306,13 @@ pub async fn edit_transaction(
             category_id = COALESCE($1, category_id),
             type_id = COALESCE($2, type_id),
             amount = COALESCE($3, amount),
-            notes = COALESCE($4, notes),
+            notes = COALESCE($4, notes)
         WHERE id = $5",
     )
     .bind(category_id)
     .bind(type_id)
     .bind(update.amount)
-    .bind(update.notes)
+    .bind(update.notes.unwrap_or_default())
     .bind(id)
     .execute(&state.postgres);
 
@@ -348,7 +348,7 @@ pub async fn delete_transaction(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
 ) -> impl IntoResponse {
-    let query = sqlx::query("DELETE FROM categories WHERE id = $1")
+    let query = sqlx::query("DELETE FROM transactions WHERE id = $1")
         .bind(id)
         .execute(&state.postgres);
 
