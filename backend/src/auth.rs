@@ -141,27 +141,6 @@ pub async fn get_user(State(state): State<AppState>, jar: PrivateCookieJar) -> i
     }
 }
 
-/// Handles retrieval of all users.
-///
-/// # GET /auth/get_all_users
-///
-/// ## Purpose:
-/// - retrieves all users returning their id, name, and emails
-pub async fn get_all_users(State(state): State<AppState>) -> impl IntoResponse {
-    let query = sqlx::query_as::<_, UserInfo>("SELECT id, name, email FROM users")
-        .fetch_all(&state.postgres)
-        .await;
-
-    match query {
-        Ok(users) => Json(users).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Failed to retrieve users: {}", e),
-        )
-            .into_response(),
-    }
-}
-
 /// A helper function used to retrieve a user's id given thier session.
 ///
 /// ## Purpose:
