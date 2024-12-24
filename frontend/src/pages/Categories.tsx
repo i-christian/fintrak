@@ -91,7 +91,7 @@ const Categories: Component = () => {
   };
 
   return (
-    <main class="p-4">
+    <main class="p-4 relative">
       <header class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-semibold text-gray-700">Manage Categories</h1>
         <button
@@ -164,133 +164,142 @@ const Categories: Component = () => {
         )}
       </section>
 
+      {/* Add Modal */}
       {open() && (
-        <div class="modal">
-          <h2 class="text-xl font-semibold">Add Category</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAddCategory();
-            }}
-          >
-            <label class="block mt-2">
-              Name:
-              <input
-                type="text"
-                value={formData().name}
-                class="border p-2 w-full"
-                onInput={(e) =>
-                  setFormData({
-                    ...formData(),
-                    name: capitalizeWords(e.currentTarget.value),
-                  })
-                }
-                required
-              />
-            </label>
-            <label class="block mt-2">
-              Type:
-              <select
-                value={formData().type}
-                class="border p-2 w-full"
-                onChange={(e) =>
-                  setFormData({ ...formData(), type: e.currentTarget.value })
-                }
-              >
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </label>
-            <div class="mt-4 flex gap-2">
-              <button
-                type="submit"
-                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Save
-              </button>
-              <button
-                class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-xl font-semibold">Add Category</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddCategory();
+              }}
+            >
+              <label class="block mt-2">
+                Name:
+                <input
+                  type="text"
+                  value={formData().name}
+                  class="border p-2 w-full"
+                  onInput={(e) =>
+                    setFormData({
+                      ...formData(),
+                      name: capitalizeWords(e.currentTarget.value),
+                    })
+                  }
+                  required
+                />
+              </label>
+              <label class="block mt-2">
+                Type:
+                <select
+                  value={formData().type}
+                  class="border p-2 w-full"
+                  onChange={(e) =>
+                    setFormData({ ...formData(), type: e.currentTarget.value })
+                  }
+                >
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </label>
+              <div class="mt-4 flex gap-2">
+                <button
+                  type="submit"
+                  class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                >
+                  Save
+                </button>
+                <button
+                  class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
+      {/* Edit Modal */}
       {editOpen() && selectedCategory() && (
-        <div class="modal">
-          <h2 class="text-xl font-semibold">Edit Category</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleEditCategory();
-            }}
-          >
-            <label class="block mt-2">
-              Name:
-              <input
-                type="text"
-                value={formData().name}
-                class="border p-2 w-full"
-                onInput={(e) =>
-                  setFormData({ ...formData(), name: e.currentTarget.value })
-                }
-                required
-              />
-            </label>
-            <label class="block mt-2">
-              Type:
-              <select
-                value={formData().type}
-                class="border p-2 w-full"
-                onChange={(e) =>
-                  setFormData({ ...formData(), type: e.currentTarget.value })
-                }
-              >
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </label>
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-xl font-semibold">Edit Category</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleEditCategory();
+              }}
+            >
+              <label class="block mt-2">
+                Name:
+                <input
+                  type="text"
+                  value={formData().name}
+                  class="border p-2 w-full"
+                  onInput={(e) =>
+                    setFormData({ ...formData(), name: e.currentTarget.value })
+                  }
+                  required
+                />
+              </label>
+              <label class="block mt-2">
+                Type:
+                <select
+                  value={formData().type}
+                  class="border p-2 w-full"
+                  onChange={(e) =>
+                    setFormData({ ...formData(), type: e.currentTarget.value })
+                  }
+                >
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </label>
+              <div class="mt-4 flex gap-2">
+                <button
+                  type="submit"
+                  class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                >
+                  Save
+                </button>
+                <button
+                  class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                  onClick={() => setEditOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteOpen() && selectedCategory() && (
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-xl font-semibold">Delete Category</h2>
+            <p>
+              Are you sure you want to delete{" "}
+              <strong>{selectedCategory()?.category_name}</strong>?
+            </p>
             <div class="mt-4 flex gap-2">
               <button
-                type="submit"
-                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                onClick={handleDeleteCategory}
               >
-                Save
+                Delete
               </button>
               <button
                 class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-                onClick={() => setEditOpen(false)}
+                onClick={() => setDeleteOpen(false)}
               >
                 Cancel
               </button>
             </div>
-          </form>
-        </div>
-      )}
-
-      {deleteOpen() && selectedCategory() && (
-        <div class="modal">
-          <h2 class="text-xl font-semibold">Delete Category</h2>
-          <p>
-            Are you sure you want to delete{" "}
-            <strong>{selectedCategory()?.category_name}</strong>?
-          </p>
-          <div class="mt-4 flex gap-2">
-            <button
-              class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-              onClick={handleDeleteCategory}
-            >
-              Delete
-            </button>
-            <button
-              class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-              onClick={() => setDeleteOpen(false)}
-            >
-              Cancel
-            </button>
           </div>
         </div>
       )}
