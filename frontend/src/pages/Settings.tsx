@@ -1,13 +1,46 @@
 import { Component, createSignal, Match, Suspense, Switch } from "solid-js";
 import { user } from "../index";
+import { editUser, deleteUser } from "../hooks/useFetch";
+import { useNavigate } from "@solidjs/router";
 
 const Settings: Component = () => {
   const [openEdit, setOpenEdit] = createSignal<boolean>(false);
   const [openDelete, setOpenDelete] = createSignal<boolean>(false);
+  const [loading, setLoading] = createSignal<boolean>(false);
+  const [formData, setFormData] = createSignal({ name: "", password: "" });
+
+  const navigate = useNavigate();
+
+  const handleEditUser = async () => {
+    setLoading(true);
+    try {
+      const { name, password } = formData();
+      await editUser(name || null, password || null);
+      setOpenEdit(false);
+    } catch (error) {
+      console.error("Failed to update user details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    setLoading(true);
+    try {
+      await deleteUser();
+      localStorage.removeItem("isLoggedIn");
+      navigate("/register");
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+    } finally {
+      setLoading(false);
+      setOpenDelete(false);
+    }
+  };
 
   return (
     <main class="mt-10 flex flex-col md:flex-row gap-5">
-      <div class="shadow-2xl border grow p-5 rounded-2xl ">
+      <div class="shadow-2xl border grow p-5 rounded-2xl">
         <section>
           <p class="font-bold text-xl">Change Name </p>
           <div
@@ -25,7 +58,7 @@ const Settings: Component = () => {
                 </Switch>
               </Suspense>
             </span>
-            <button onClick={() => setOpenEdit(!openEdit())}>
+            <button onClick={() => setOpenEdit(true)}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -43,108 +76,89 @@ const Settings: Component = () => {
             </button>
           </div>
           <form
-            class={`flex flex-row gap-5 ${!openEdit() ? "hidden" : "block"} `}
+            class={`flex flex-col gap-4 ${!openEdit() ? "hidden" : "block"} `}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleEditUser();
+            }}
           >
-            <label for="name">
-              New Name:
-              <input id="name" class="ml-2 p-1 rounded-md border" type="text" />
+            <label for="name" class="flex flex-col">
+              <span>New Name:</span>
+              <input
+                id="name"
+                class="p-2 border rounded-md"
+                type="text"
+                onInput={(e) =>
+                  setFormData({ ...formData(), name: e.currentTarget.value })
+                }
+              />
             </label>
-            <button
-              class="bg-emerald-600 hover:bg-emerald-900 rounded-md px-5 text-white w-fit"
-              onClick={() => setOpenEdit(!openEdit())}
-            >
-              Save
-            </button>
-            <button
-              class="bg-red-600 hover:bg-red-900 rounded-md px-5 text-white w-fit"
-              onClick={() => setOpenEdit(!openEdit())}
-            >
-              cancel
-            </button>
-          </form>
-        </section>
-        <hr class="my-5" />
-
-        <section>
-          <p class="font-bold text-xl my-2">Reset Password</p>
-          <form class="flex flex-col">
-            <label for="password">
+            <label for="password" class="flex flex-col">
+              <span>New Password:</span>
               <input
                 id="password"
-                class="p-1 rounded-md border"
-                type="text"
-                placeholder="new password"
+                class="p-2 border rounded-md"
+                type="password"
+                onInput={(e) =>
+                  setFormData({
+                    ...formData(),
+                    password: e.currentTarget.value,
+                  })
+                }
               />
             </label>
-            <br />
-            <label for="confirm">
-              <input
-                id="confirm"
-                class="p-1 rounded-md border"
-                type="text"
-                placeholder="Confirm Password"
-              />
-            </label>
-            <div class="flex gap-5 ml-2">
-              <button class="rounded-md bg-emerald-600 hover:bg-emerald-900 my-2 w-fit px-5">
+            <div class="flex gap-5">
+              <button
+                type="submit"
+                class={`bg-emerald-600 hover:bg-emerald-900 px-5 py-2 rounded-md text-white ${
+                  loading() ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={loading()}
+              >
                 Save
               </button>
-              <button class="rounded-md bg-red-600 hover:bg-red-900 my-2 w-fit px-5">
-                cancel
+              <button
+                type="button"
+                class="bg-red-600 hover:bg-red-900 px-5 py-2 rounded-md text-white"
+                onClick={() => setOpenEdit(false)}
+              >
+                Cancel
               </button>
             </div>
           </form>
         </section>
       </div>
+
       <section class="shadow-2xl border grow p-5 rounded-2xl">
-        <h1 class="font-bold text-xl text-red-900"> Account Deactivation </h1>
+        <h1 class="font-bold text-xl text-red-900">Account Deactivation</h1>
         <div
           class={`flex flex-row gap-5 ${openDelete() ? "hidden" : "block"} `}
         >
-          <span class="text-xl py-2">
-            <Suspense fallback={<div>Loading...</div>}>
-              <Switch>
-                <Match when={user.error}>
-                  <span>Anonymous User</span>
-                </Match>
-                <Match when={user()}>
-                  <p>{user().name}</p>
-                </Match>
-              </Switch>
-            </Suspense>
-          </span>
-          <button onClick={() => setOpenDelete(!openDelete())}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-              />
-            </svg>
+          <button
+            class="bg-red-600 hover:bg-red-900 px-5 py-2 rounded-md text-white"
+            onClick={() => setOpenDelete(true)}
+          >
+            Deactivate Account
           </button>
         </div>
         <div
           class={`flex flex-row gap-5 ${!openDelete() ? "hidden" : "block"} `}
         >
-          <h1 class="italic">Are you sure you want to delete?</h1>
+          <h1 class="italic">Are you sure you want to delete your account?</h1>
           <button
-            class="bg-emerald-600 hover:bg-emerald-900 rounded-md px-5 text-white w-fit"
-            onClick={() => setOpenDelete(!openDelete())}
+            class={`bg-emerald-600 hover:bg-emerald-900 px-5 py-2 rounded-md text-white ${
+              loading() ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handleDeleteUser}
+            disabled={loading()}
           >
-            YES
+            Yes
           </button>
           <button
-            class="bg-red-600 hover:bg-red-900 rounded-md px-5 text-white w-fit"
-            onClick={() => setOpenDelete(!openDelete())}
+            class="bg-red-600 hover:bg-red-900 px-5 py-2 rounded-md text-white"
+            onClick={() => setOpenDelete(false)}
           >
-            NO
+            No
           </button>
         </div>
       </section>
