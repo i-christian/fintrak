@@ -10,6 +10,38 @@ export const getUser = async () => {
   return response.json();
 };
 
+export const editUser = async (
+  name: string | null,
+  password: string | null,
+) => {
+  const response = await fetch(`//${window.location.host}/api/auth/user`, {
+    method: "PUT",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      password: password,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create category");
+  }
+};
+
+export const deleteUser = async () => {
+  const response = await fetch(`//${window.location.host}/api/auth/user`, {
+    method: "DELETE",
+    mode: "cors",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create category");
+  }
+};
+
 export const getCategories = async () => {
   const response = await fetch(`//${window.location.host}/api/categories`, {
     method: "GET",

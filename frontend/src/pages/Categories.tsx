@@ -240,7 +240,10 @@ const Categories: Component = () => {
                   value={formData().name}
                   class="border p-2 w-full"
                   onInput={(e) =>
-                    setFormData({ ...formData(), name: e.currentTarget.value })
+                    setFormData({
+                      ...formData(),
+                      name: capitalizeWords(e.currentTarget.value),
+                    })
                   }
                   required
                 />
