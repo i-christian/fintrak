@@ -1,5 +1,5 @@
 import { render } from "solid-js/web";
-import { Route, Router, Navigate } from "@solidjs/router";
+import { Route, Router } from "@solidjs/router";
 import {
   Component,
   createResource,
@@ -20,33 +20,32 @@ const Settings: Component = lazy(() => import("./pages/Settings"));
 const Categories: Component = lazy(() => import("./pages/Categories"));
 const Transactions: Component = lazy(() => import("./pages/Transactions"));
 
-//should be set to false
-export const [isLoggedIn, setIsLoggedIn] = createSignal(true);
-export const [user] = createResource(getUser);
+export const [isLoggedIn, setIsLoggedIn] = createSignal(false);
+export const [user, { refetch }] = createResource(getUser);
 
 const App: Component = () => {
-  // onMount(async () => {
-  //   if (localStorage.getItem("isLoggedIn") === "true") {
-  //     try {
-  //       const response = await fetch(`//${window.location.host}/api/check`, {
-  //         method: "GET",
-  //         credentials: "include"
-  //       });
+  onMount(async () => {
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      try {
+        const response = await fetch(`//${window.location.host}/api/check`, {
+          method: "GET",
+          credentials: "include",
+        });
 
-  //       if (response.ok) {
-  //         setIsLoggedIn(true);
-  //         localStorage.setItem("isLoggedIn", "true");
-  //       } else {
-  //         setIsLoggedIn(false);
-  //         localStorage.removeItem("isLoggedIn");
-  //       }
-  //     } catch (error) {
-  //       console.error("Auth check error:", error);
-  //       setIsLoggedIn(false);
-  //     }
-  //   }
-  //   setIsLoggedIn(false);
-  // });
+        if (response.ok) {
+          setIsLoggedIn(true);
+          localStorage.setItem("isLoggedIn", "true");
+        } else {
+          setIsLoggedIn(false);
+          localStorage.removeItem("isLoggedIn");
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        setIsLoggedIn(false);
+      }
+    }
+    setIsLoggedIn(false);
+  });
 
   return (
     <Router>

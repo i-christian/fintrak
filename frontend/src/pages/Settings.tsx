@@ -1,5 +1,5 @@
 import { Component, createSignal, Match, Suspense, Switch } from "solid-js";
-import { user } from "../index";
+import { refetch, user } from "../index";
 import { editUser, deleteUser } from "../hooks/useFetch";
 import { useNavigate } from "@solidjs/router";
 
@@ -17,6 +17,7 @@ const Settings: Component = () => {
       const { name, password } = formData();
       await editUser(name || null, password || null);
       setOpenEdit(false);
+      refetch();
     } catch (error) {
       console.error("Failed to update user details:", error);
     } finally {
