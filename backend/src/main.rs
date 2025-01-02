@@ -109,7 +109,7 @@ async fn create_superuser(state: &AppState, name: String, email: String, passwor
     let role = "admin".to_string();
 
     let query =
-        sqlx::query("INSERT INTO users (name, email, password, role) values ($1, $2, $3, $4)")
+        sqlx::query("INSERT INTO users (name, email, password, role) values ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING")
             .bind(name)
             .bind(email)
             .bind(hashed_password)
