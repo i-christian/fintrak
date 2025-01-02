@@ -38,7 +38,8 @@ async fn main() {
     tracing::subscriber::set_global_default(FmtSubscriber::default())
         .expect("setting default subscriber failed");
 
-    let (database_url, domain, static_files_dir) = grab_secrets();
+    let (database_url, domain, static_files_dir, admin_user, admin_pass, admin_email) =
+        grab_secrets();
     let postgres = PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)
@@ -67,6 +68,8 @@ async fn main() {
     );
 
     info!("Started Application on: http://{}:3000", state.domain);
+    create_superuser(&state, admin_user, admin_email, admin_pass).await;
+
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
         .expect("Failed to bind port");
@@ -75,7 +78,7 @@ async fn main() {
         .expect("Failed to start application");
 }
 
-fn grab_secrets() -> (String, String, String) {
+fn grab_secrets() -> (String, String, String, String, String, String) {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
@@ -85,5 +88,36 @@ fn grab_secrets() -> (String, String, String) {
     };
     let static_files_dir = env::var("STATIC_FILES_DIR").unwrap_or_else(|_| "dist".to_string());
 
-    (database_url, domain, static_files_dir)
+    let admin_user = env::var("SUPER_USERNAME").expect("Superuser name must be set");
+
+    let admin_pass = env::var("SUPER_USERPASSWORD").expect("Superuser password must be set");
+
+    let admin_email = env::var("SUPER_EMAIL").expect("Superuser email must be set");
+
+    (
+        database_url,
+        domain,
+        static_files_dir,
+        admin_user,
+        admin_pass,
+        admin_email,
+    )
+}
+
+async fn create_superuser(state: &AppState, name: String, email: String, password: String) {
+    let hashed_password = bcrypt::hash(password, 10).unwrap();
+    let role = "admin".to_string();
+
+    let query =
+        sqlx::query("INSERT INTO users (name, email, password, role) values ($1, $2, $3, $4)")
+            .bind(name)
+            .bind(email)
+            .bind(hashed_password)
+            .bind(role)
+            .execute(&state.postgres);
+
+    match query.await {
+        Ok(_) => info!("Superuser account created successfully"),
+        Err(e) => info!("Failed to create superuser account {e}"),
+    }
 }
