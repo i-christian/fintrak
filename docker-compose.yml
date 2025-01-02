@@ -42,6 +42,9 @@ services:
     environment:
       - DOMAIN_URL=${DOMAIN_URL}
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SUPER_USERNAME=${SUPER_USERNAME}
+      - SUPER_USERPASSWORD=${SUPER_USERPASSWORD}
+      - SUPER_EMAIL=${SUPER_EMAIL}
       - STATIC_FILES_DIR=/usr/local/bin/dist
     ports:
       - "3000:3000"
