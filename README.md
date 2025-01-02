@@ -72,6 +72,11 @@ Clone the `fintrak` repository to your local machine:
   git clone https://github.com/i-christian/fintrak.git && cd fintrak
 ```
 
+### Sample Credentials
+The applications creates a superuser account which one can use to test the app. 
+- The login details are: `admin@example.com` for email and `changethis` for password.
+- These should be changed in `.env` file and also in docker compose secrets during deployment.
+- When deploying using github actions, set these in github secrets together with all other environment variables in `.env` 
 
 ### Running with Docker 🐳
 - **Build and Start**: Ensure Docker is installed, then run the following command to build and start the services.
